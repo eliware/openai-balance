@@ -39,6 +39,11 @@ async function readPackageVersion(scriptDir = repoRoot) {
   return JSON.parse(contents).version;
 }
 
+async function readExampleSummary(scriptDir = repoRoot) {
+  const contents = await fs.readFile(path.join(scriptDir, 'tests/example.json'), 'utf8');
+  return JSON.parse(contents);
+}
+
 function makeResponse({ status = 200, ok = true, json }) {
   return {
     status,
@@ -47,4 +52,4 @@ function makeResponse({ status = 200, ok = true, json }) {
   };
 }
 
-export { cliPath, createRecorder, makeResponse, readPackageVersion, repoRoot, withTempDir, writeEnv };
+export { cliPath, createRecorder, makeResponse, readExampleSummary, readPackageVersion, repoRoot, withTempDir, writeEnv };

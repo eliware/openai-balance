@@ -1,5 +1,12 @@
 # Release Notes
 
+## 1.1.1 - 2026-07-11
+
+- Added combined USD/nano-dollar output.
+- Added credit history summary tables.
+- Added grouped short flags and CLI validation for invalid options and conflicting nano/combined flags.
+- Expanded tests for the new CLI modes.
+
 ## 1.1.0 - 2026-07-11
 
 - Split the CLI into focused modules under src/.
@@ -8,7 +15,7 @@
 
 ## 1.0.5 - 2026-07-11
 
-Release notes sync only.
+- Release notes sync only.
 
 ## 1.0.4 - 2026-07-11
 
@@ -32,4 +39,4 @@ Initial release of openai-balance.
 
 ## 1.0.0 - 2026-07-11
 
-Accidental release tag with half-baked code. Superseded by 1.0.1.
+- Accidental release tag with half-baked code. Superseded by 1.0.1.

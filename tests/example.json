@@ -1,0 +1,92 @@
+{
+  "object": "credit_summary",
+  "total_granted": 200,
+  "total_used": 191.081601325,
+  "total_available": 8.918398675,
+  "total_paid_available": 8.918398675,
+  "grants": {
+    "object": "list",
+    "data": [
+      {
+        "object": "credit_summary",
+        "id": "in_1TqrdBC6h1nxGoI3dQRhqozk",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1782864000,
+        "expires_at": 1817078400
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1TrmEbC6h1nxGoI3HyPICiVe",
+        "grant_amount": 10,
+        "used_amount": 1.081601325,
+        "effective_at": 1782864000,
+        "expires_at": 1817078400
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1To51UC6h1nxGoI3FqyXNRxx",
+        "grant_amount": 30,
+        "used_amount": 30,
+        "effective_at": 1780272000,
+        "expires_at": null
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1Tq3ixC6h1nxGoI3eqeYZTY6",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1782864000,
+        "expires_at": null
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1TicQLC6h1nxGoI3oH2YcGa1",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1780272000,
+        "expires_at": null
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1SpLovC6h1nxGoI3d5bKpEbh",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1767225600,
+        "expires_at": null
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1TpQF2C6h1nxGoI3b6RBO7Cc",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1782864000,
+        "expires_at": null
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1TniVoC6h1nxGoI349OpQ5kR",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1782864000,
+        "expires_at": null
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1TW6CaC6h1nxGoI37e4R3McD",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1777593600,
+        "expires_at": null
+      },
+      {
+        "object": "credit_summary",
+        "id": "in_1SxoO7C6h1nxGoI3GJJA7AgO",
+        "grant_amount": 20,
+        "used_amount": 20,
+        "effective_at": 1769904000,
+        "expires_at": null
+      }
+    ]
+  }
+}
