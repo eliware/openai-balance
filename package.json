@@ -8,10 +8,11 @@
     },
     "scripts": {
         "start": "node balance.mjs",
-        "test": "node --test",
+        "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --coverage --detectOpenHandles --silent --runInBand",
         "lint": "oxlint ."
     },
     "devDependencies": {
+        "jest": "^30.4.2",
         "oxlint": "^1.73.0"
     },
     "description": "Display the current OpenAI credit balance in a single terminal line.",
@@ -21,5 +22,20 @@
         "credits",
         "terminal",
         "cli"
-    ]
+    ],
+    "jest": {
+        "testEnvironment": "node",
+        "coveragePathIgnorePatterns": [
+            "/src/agent\\.mjs$",
+            "/src/completion\\.mjs$",
+            "/src/shell\\.mjs$",
+            "/src/tool-shell\\.mjs$"
+        ],
+        "testMatch": [
+            "**/?(*.)+(spec|test).[jt]s?(x)",
+            "**/?(*.)+(spec|test).mjs",
+            "**/?(*.)+(spec|test).cjs"
+        ]
+    },
+    "license": "MIT"
 }

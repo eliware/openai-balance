@@ -4,14 +4,21 @@ Project: openai-balance
 
 Purpose:
 - Print the current OpenAI credit balance as a single terminal line.
-- Default output format: OpenAI credit balance: $10.16
-- On auth failure, print one-line error: OpenAI credit balance: invalid bearer token
+- Default success format: OpenAI credit balance: $10.16
+- Auth failures (401/403) print: OpenAI credit balance: invalid bearer token
 
 Files:
 - balance.mjs: CLI entry point and HTTP fetch logic
-- test/balance.test.mjs: node:test coverage for formatting, env loading, and CLI behavior
+- test/balance.test.mjs: Jest coverage for formatting, env loading, and CLI behavior
 - README.md: user-facing usage notes
+- .env.example: sample local config
 - .env: local config only; do not commit secrets
+
+Behavior:
+- Keep stdout/stderr to one line per run.
+- Configuration precedence is shell env > .env in the current working directory > .env in the script directory.
+- API responses read total_available first, then total_paid_available.
+- Missing config, HTTP errors, malformed responses, and unexpected failures all print one-line errors.
 
 Commands:
 - npm start
@@ -20,7 +27,7 @@ Commands:
 - ./balance.mjs
 
 Notes:
-- Keep output to one line only.
-- Prefer small, focused changes.
-- If changing CLI behavior, update tests.
+- Keep changes small and focused.
+- If changing CLI behavior, update the Jest tests.
+- Keep README.md aligned with the current behavior.
 - Root login shell hook lives in /root/.bash_profile outside this repo.

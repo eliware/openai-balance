@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 import fs from 'node:fs/promises';
+import fsSync from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 async function loadEnvFile(filePath, readFile = fs.readFile) {
   try {
@@ -42,8 +43,8 @@ async function loadEnvFile(filePath, readFile = fs.readFile) {
   }
 }
 
-function getConfigValue(name, envFile) {
-  return process.env[name] ?? envFile[name];
+function getConfigValue(name, envFile, envSource = process.env) {
+  return envSource[name] ?? envFile[name];
 }
 
 function extractBalance(summary) {
@@ -59,23 +60,51 @@ function formatBalance(amount) {
   return `OpenAI credit balance: $${amount.toFixed(2)}`;
 }
 
-function fail(message) {
-  console.error(`OpenAI credit balance: ${message}`);
-  process.exitCode = 1;
+function fail(message, stderr = console.error, setExitCode = (code) => {
+  process.exitCode = code;
+}) {
+  stderr(`OpenAI credit balance: ${message}`);
+  setExitCode(1);
 }
 
-async function main() {
+async function loadConfigEnvFile({ cwd = process.cwd(), scriptDir = path.dirname(fileURLToPath(import.meta.url)) } = {}) {
+  const envFiles = [path.join(scriptDir, '.env')];
+
+  if (cwd !== scriptDir) {
+    envFiles.push(path.resolve(cwd, '.env'));
+  }
+
+  const envFile = {};
+
+  for (const filePath of envFiles) {
+    Object.assign(envFile, await loadEnvFile(filePath));
+  }
+
+  return envFile;
+}
+
+async function main({
+  cwd = process.cwd(),
+  scriptDir = path.dirname(fileURLToPath(import.meta.url)),
+  envSource = process.env,
+  fetchFn = fetch,
+  log = console.log,
+  stderr = console.error,
+  setExitCode = (code) => {
+    process.exitCode = code;
+  }
+} = {}) {
   try {
-    const envFile = await loadEnvFile(path.resolve(process.cwd(), '.env'));
-    const endpoint = getConfigValue('ENDPOINT', envFile);
-    const authHeader = getConfigValue('AUTH_HEADER', envFile);
+    const envFile = await loadConfigEnvFile({ cwd, scriptDir });
+    const endpoint = getConfigValue('ENDPOINT', envFile, envSource);
+    const authHeader = getConfigValue('AUTH_HEADER', envFile, envSource);
 
     if (!endpoint || !authHeader) {
-      fail('missing ENDPOINT or AUTH_HEADER');
-      return;
+      fail('missing ENDPOINT or AUTH_HEADER', stderr, setExitCode);
+      return false;
     }
 
-    const response = await fetch(endpoint, {
+    const response = await fetchFn(endpoint, {
       headers: {
         Authorization: authHeader,
         Accept: 'application/json'
@@ -83,25 +112,38 @@ async function main() {
     });
 
     if (response.status === 401 || response.status === 403) {
-      fail('invalid bearer token');
-      return;
+      fail('invalid bearer token', stderr, setExitCode);
+      return false;
     }
 
     if (!response.ok) {
-      fail(`request failed (${response.status})`);
-      return;
+      fail(`request failed (${response.status})`, stderr, setExitCode);
+      return false;
     }
 
     const summary = await response.json();
     const balance = extractBalance(summary);
-    console.log(formatBalance(balance));
+    log(formatBalance(balance));
+    return true;
   } catch (error) {
-    fail(error?.message || 'unexpected error');
+    fail(error?.message || 'unexpected error', stderr, setExitCode);
+    return false;
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  await main();
+function toRealFileUrl(filePath) {
+  return pathToFileURL(fsSync.realpathSync(filePath)).href;
 }
 
-export { extractBalance, formatBalance, loadEnvFile };
+async function cli({ argv1 = process.argv[1], moduleUrl = import.meta.url, ...mainOptions } = {}) {
+  if (argv1 && moduleUrl === toRealFileUrl(argv1)) {
+    await main(mainOptions);
+    return true;
+  }
+
+  return false;
+}
+
+await cli();
+
+export { cli, extractBalance, fail, formatBalance, getConfigValue, loadConfigEnvFile, loadEnvFile, main };
