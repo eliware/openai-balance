@@ -1,7 +1,6 @@
 {
     "name": "@eliware/openai-balance",
-    "version": "1.0.1",
-    "private": true,
+    "version": "1.0.3",
     "type": "module",
     "bin": {
         "openai-balance": "./balance.mjs"
