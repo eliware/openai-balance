@@ -1,6 +1,10 @@
 # Release Notes
 
-## 1.0.2 - 2026-07-11
+## 1.0.5 - 2026-07-11
+
+- Added `repository.url` to `package.json` so npm provenance validation matches GitHub Actions.
+
+## 1.0.3 - 2026-07-11
 
 - Removed `private: true` from `package.json` so the package can publish.
 

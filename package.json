@@ -1,6 +1,6 @@
 {
     "name": "@eliware/openai-balance",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "type": "module",
     "bin": {
         "openai-balance": "./balance.mjs"
@@ -36,5 +36,9 @@
             "**/?(*.)+(spec|test).cjs"
         ]
     },
-    "license": "MIT"
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/eliware/openai-balance"
+    }
 }
