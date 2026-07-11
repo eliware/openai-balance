@@ -9,6 +9,12 @@ Usage:
 - ./balance.mjs
 - npx openai-balance
 
+Options:
+- -n, --nano-dollars: print the balance in nano dollars, with commas and an n suffix
+- -v, --version: print the package.json version
+- -j, --json: print the full API response as pretty JSON
+- -h, --help: show a short help message
+
 Configuration:
 - ENDPOINT
 - AUTH_HEADER
@@ -24,6 +30,9 @@ Example .env:
 
 Output:
 - Success: OpenAI credit balance: $10.16
+- Nano dollars: OpenAI credit balance: 10,160,000,000n
+- Version: current package.json version
+- JSON: pretty-printed API response body
 - Auth failure: OpenAI credit balance: invalid bearer token
 - Other errors: one-line OpenAI credit balance: ... message
 

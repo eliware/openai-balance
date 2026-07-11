@@ -1,5 +1,11 @@
 # Release Notes
 
+## 1.1.0 - 2026-07-11
+
+- Split the CLI into focused modules under src/.
+- Added help, version, JSON, and nano-dollar output modes.
+- Expanded Jest coverage for the new helpers and entrypoint behavior.
+
 ## 1.0.5 - 2026-07-11
 
 Release notes sync only.
