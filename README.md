@@ -44,3 +44,20 @@ Output:
 - Invalid options: one-line OpenAI credit balance: invalid option(s): ...
 
 The API response should include total_available or total_paid_available for balance mode, and grants.data for summary mode.
+
+## Support
+
+For help, questions, or community chat:
+
+[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)
+
+## License
+
+[MIT © Eli Sterling, eliware.org](LICENSE)
+
+## Links
+
+- [Home Page](https://eliware.org)
+- [GitHub Repo](https://github.com/eliware/openai-balance)
+- [GitHub Org](https://github.com/eliware)
+- [Discord](https://discord.gg/M6aTR9eTwN)
