@@ -35,3 +35,7 @@ Notes:
 - Keep README.md aligned with the current behavior.
 - Update RELEASE_NOTES.md for user-visible changes before a version bump.
 - Root login shell hook lives in /root/.bash_profile outside this repo.
+- Do not over-engineer simple tasks.
+- Do not guess when confused.
+- Do not make random, pointless changes.
+- Check your own work before saying you're done.
