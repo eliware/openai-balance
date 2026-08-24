@@ -7,7 +7,7 @@ Prints OpenAI credit information in a terminal-friendly format.
 Usage:
 - npm start
 - ./balance.mjs
-- npx openai-balance
+- npx @eliware/openai-balance
 
 Options:
 - -n, --nano-dollars: print the balance in nano dollars
@@ -33,7 +33,7 @@ Precedence:
 4. .env in the script directory
 
 For a global install, create `~/.openai-balance/.env` (for example,
-`C:\\Users\\you\\.openai-balance\\.env` on Windows or
+`C:\Users\you\.openai-balance\.env` on Windows or
 `/home/you/.openai-balance/.env` on Linux). Create the directory manually and
 restrict the file so it is readable only by your user.
 
@@ -58,6 +58,13 @@ Validation:
 - `npm test` runs the baseline tests, coverage gate, and lint.
 - `npm run lint` runs lint only.
 - `npm run pack` previews the files that would be published.
+
+Security and operations:
+- Use a least-privilege bearer token and rotate it if it is exposed.
+- The command makes one HTTPS request to `ENDPOINT` and exits with status 1
+  for configuration, authentication, HTTP, or response errors.
+- The normal balance output is timestamped in UTC; `--json` and `--summary`
+  provide structured response modes.
 
 ## Support
 

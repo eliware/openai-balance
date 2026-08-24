@@ -20,6 +20,8 @@
 - Added an ISO 8601 UTC timestamp to normal balance output.
 - Expanded regression tests for configuration precedence, malformed API data,
   timestamped output, and cross-platform CLI behavior.
+- Corrected scoped `npx` usage and synchronized project guidance with the
+  user-level configuration and timestamped output behavior.
 
 ## 1.1.1 - 2026-07-11
 
