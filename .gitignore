@@ -9,5 +9,4 @@ pnpm-debug.log*
 
 coverage/
 
-.jest.result
 .agentx*
