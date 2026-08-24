@@ -1,63 +1,63 @@
 {
-  "name": "@eliware/openai-balance",
-  "version": "1.1.1",
-  "type": "module",
-  "engines": {
-    "node": ">=26"
-  },
-  "exports": {
-    ".": "./src/index.mjs"
-  },
-  "files": [
-    "balance.mjs",
-    "src",
-    "README.md",
-    "RELEASE_NOTES.md",
-    "LICENSE",
-    ".env.example"
-  ],
-  "bin": {
-    "openai-balance": "balance.mjs"
-  },
-  "scripts": {
-    "start": "node balance.mjs",
-    "test": "eliware-test",
-    "lint": "eliware-test --lint",
-    "pack": "npm pack --dry-run"
-  },
-  "devDependencies": {
-    "@eliware/test": "^1.0.3"
-  },
-  "description": "Display the current OpenAI credit balance in a single terminal line.",
-  "keywords": [
-    "openai",
-    "balance",
-    "credits",
-    "terminal",
-    "cli"
-  ],
-  "jest": {
-    "testEnvironment": "node",
-    "coveragePathIgnorePatterns": [
-      "/src/agent\\.mjs$",
-      "/src/completion\\.mjs$",
-      "/src/shell\\.mjs$",
-      "/src/tool-shell\\.mjs$"
+    "name": "@eliware/openai-balance",
+    "version": "1.1.2",
+    "type": "module",
+    "engines": {
+        "node": ">=26"
+    },
+    "exports": {
+        ".": "./src/index.mjs"
+    },
+    "files": [
+        "balance.mjs",
+        "src",
+        "README.md",
+        "RELEASE_NOTES.md",
+        "LICENSE",
+        ".env.example"
     ],
-    "testMatch": [
-      "**/?(*.)+(spec|test).[jt]s?(x)",
-      "**/?(*.)+(spec|test).mjs",
-      "**/?(*.)+(spec|test).cjs"
-    ]
-  },
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/eliware/openai-balance.git"
-  },
-  "homepage": "https://github.com/eliware/openai-balance#readme",
-  "bugs": {
-    "url": "https://github.com/eliware/openai-balance/issues"
-  },
-  "author": "Eli Sterling"
+    "bin": {
+        "openai-balance": "balance.mjs"
+    },
+    "scripts": {
+        "start": "node balance.mjs",
+        "test": "eliware-test",
+        "lint": "eliware-test --lint",
+        "pack": "npm pack --dry-run"
+    },
+    "devDependencies": {
+        "@eliware/test": "^1.0.3"
+    },
+    "description": "Display the current OpenAI credit balance in a single terminal line.",
+    "keywords": [
+        "openai",
+        "balance",
+        "credits",
+        "terminal",
+        "cli"
+    ],
+    "jest": {
+        "testEnvironment": "node",
+        "coveragePathIgnorePatterns": [
+            "/src/agent\\.mjs$",
+            "/src/completion\\.mjs$",
+            "/src/shell\\.mjs$",
+            "/src/tool-shell\\.mjs$"
+        ],
+        "testMatch": [
+            "**/?(*.)+(spec|test).[jt]s?(x)",
+            "**/?(*.)+(spec|test).mjs",
+            "**/?(*.)+(spec|test).cjs"
+        ]
+    },
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/eliware/openai-balance.git"
+    },
+    "homepage": "https://github.com/eliware/openai-balance#readme",
+    "bugs": {
+        "url": "https://github.com/eliware/openai-balance/issues"
+    },
+    "author": "Eli Sterling"
 }
