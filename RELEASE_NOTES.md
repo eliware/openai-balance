@@ -1,11 +1,25 @@
 # Release Notes
 
-## Unreleased
+## 1.1.2 - 2026-08-24
 
-- Aligned test, lint, packaging, and CI workflows with the shared conventions.
-- Added validation for non-finite balances and malformed credit history values.
+- Aligned test, lint, packaging, documentation, and CI workflows with the
+  shared conventions.
+- Migrated baseline testing and linting to `@eliware/test`, with 100×4
+  coverage enforcement and zero-warning lint checks.
+- Added Node.js 26 engine metadata, explicit package exports, and a package
+  file allowlist.
+- Added portable Ubuntu and Windows CI validation, production dependency
+  auditing, and package dry-run validation.
+- Separated publishing into a single gated Ubuntu job to prevent duplicate
+  publishes from the platform matrix.
+- Added user-level configuration at `~/.openai-balance/.env`, with documented
+  configuration precedence and bearer-token safety guidance.
+- Added validation for non-finite balances and malformed credit history
+  values.
 - Sanitized unexpected error messages to preserve single-line CLI errors.
 - Added an ISO 8601 UTC timestamp to normal balance output.
+- Expanded regression tests for configuration precedence, malformed API data,
+  timestamped output, and cross-platform CLI behavior.
 
 ## 1.1.1 - 2026-07-11
 
