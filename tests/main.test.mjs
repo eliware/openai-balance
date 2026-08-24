@@ -54,6 +54,7 @@ AUTH_HEADER=Bearer script-token
         const result = await main({
           cwd,
           scriptDir,
+          homeDir: null,
           envSource: {},
           fetchFn: async (url, options) => {
             calls.push({ url, options });
@@ -80,7 +81,7 @@ AUTH_HEADER=Bearer script-token
             }
           }
         ]);
-        expect(recorder.logs).toEqual(['OpenAI credit balance: $10.16']);
+        expect(recorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$10\.16$/);
         expect(recorder.errors).toEqual([]);
         expect(recorder.exitCode).toBeUndefined();
       });
@@ -106,7 +107,7 @@ AUTH_HEADER=Bearer script-token
     });
 
     expect(result).toBe(true);
-    expect(recorder.logs).toEqual(['OpenAI credit balance: $1.23 (1,230,000,000n)']);
+    expect(recorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$1\.23 \(1,230,000,000n\)$/);
   });
 
   test('main prints a summary table in USD by default', async () => {
@@ -319,6 +320,7 @@ AUTH_HEADER=Bearer script-token
           return main({
             cwd,
             scriptDir,
+            homeDir: null,
             envSource: {},
             fetchFn: async () => {
               throw new Error('fetch should not run');
@@ -356,6 +358,53 @@ AUTH_HEADER=Bearer script-token
 
     expect(result).toBe(false);
     expect(recorder.errors).toEqual(['OpenAI credit balance: missing balance']);
+    expect(recorder.exitCode).toBe(1);
+  });
+
+  test('main rejects non-finite balances', async () => {
+    const recorder = createRecorder();
+
+    await main({
+      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
+      fetchFn: async () => makeResponse({ json: async () => ({ total_available: Infinity }) }),
+      log: recorder.log,
+      stderr: recorder.stderr,
+      setExitCode: recorder.setExitCode
+    });
+
+    expect(recorder.errors).toEqual(['OpenAI credit balance: missing balance']);
+    expect(recorder.exitCode).toBe(1);
+  });
+
+  test('main rejects malformed summary amounts', async () => {
+    const recorder = createRecorder();
+
+    await main({
+      argv: ['--summary'],
+      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
+      fetchFn: async () => makeResponse({ json: async () => ({ grants: { data: [{ grant_amount: 'bad', used_amount: 1 }] } }) }),
+      log: recorder.log,
+      stderr: recorder.stderr,
+      setExitCode: recorder.setExitCode
+    });
+
+    expect(recorder.errors).toEqual(['OpenAI credit balance: malformed credit history']);
+    expect(recorder.exitCode).toBe(1);
+  });
+
+  test('main rejects malformed combined summary amounts', async () => {
+    const recorder = createRecorder();
+
+    await main({
+      argv: ['--summary', '--combined'],
+      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
+      fetchFn: async () => makeResponse({ json: async () => ({ grants: { data: [{ grant_amount: 1, used_amount: 'bad' }] } }) }),
+      log: recorder.log,
+      stderr: recorder.stderr,
+      setExitCode: recorder.setExitCode
+    });
+
+    expect(recorder.errors).toEqual(['OpenAI credit balance: malformed credit history']);
     expect(recorder.exitCode).toBe(1);
   });
 
@@ -430,7 +479,7 @@ AUTH_HEADER=Bearer script-token
           const result = await main();
 
           expect(result).toBe(true);
-          expect(logs).toEqual(['OpenAI credit balance: $4.20']);
+          expect(logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$4\.20$/);
           expect(errors).toEqual([]);
           expect(process.exitCode).toBeUndefined();
         });
@@ -493,7 +542,7 @@ AUTH_HEADER=Bearer script-token
     expect(helpRecorder.logs[0]).toContain('Usage: openai-balance [options]');
     expect(versionRecorder.logs).toEqual([packageVersion]);
     expect(jsonRecorder.logs).toEqual([JSON.stringify({ object: 'credit_summary', total_available: 1.23 }, null, 2)]);
-    expect(nanoRecorder.logs).toEqual(['OpenAI credit balance: 1,230,000,000n']);
-    expect(combinedRecorder.logs).toEqual(['OpenAI credit balance: $1.23 (1,230,000,000n)']);
+    expect(nanoRecorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: 1,230,000,000n$/);
+    expect(combinedRecorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$1\.23 \(1,230,000,000n\)$/);
   });
 });

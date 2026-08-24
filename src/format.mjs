@@ -67,6 +67,9 @@ function formatSummary(summary, { combined = false, nanoDollars = false } = {}) 
     const rows = grants.map((grant) => {
       const granted = Number(grant.grant_amount);
       const used = Number(grant.used_amount);
+      if (!Number.isFinite(granted) || !Number.isFinite(used)) {
+        throw new Error('malformed credit history');
+      }
       const available = granted - used;
 
       return [
@@ -92,6 +95,9 @@ function formatSummary(summary, { combined = false, nanoDollars = false } = {}) 
   const rows = grants.map((grant) => {
     const granted = Number(grant.grant_amount);
     const used = Number(grant.used_amount);
+    if (!Number.isFinite(granted) || !Number.isFinite(used)) {
+      throw new Error('malformed credit history');
+    }
     const available = granted - used;
 
     return [

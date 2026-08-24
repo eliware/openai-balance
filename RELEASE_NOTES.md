@@ -1,5 +1,12 @@
 # Release Notes
 
+## Unreleased
+
+- Aligned test, lint, packaging, and CI workflows with the shared conventions.
+- Added validation for non-finite balances and malformed credit history values.
+- Sanitized unexpected error messages to preserve single-line CLI errors.
+- Added an ISO 8601 UTC timestamp to normal balance output.
+
 ## 1.1.1 - 2026-07-11
 
 - Added combined USD/nano-dollar output.

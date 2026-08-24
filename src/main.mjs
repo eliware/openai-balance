@@ -8,17 +8,19 @@ import { loadPackageVersion } from './version.mjs';
 function fail(message, stderr = console.error, setExitCode = (code) => {
   process.exitCode = code;
 }) {
-  stderr(`OpenAI credit balance: ${message}`);
+  stderr(`OpenAI credit balance: ${String(message).replace(/[\r\n]+/g, ' ')}`);
   setExitCode(1);
 }
 
 async function main({
   cwd = process.cwd(),
   scriptDir = projectRoot,
+  homeDir,
   envSource = process.env,
   fetchFn = fetch,
   log = console.log,
   stderr = console.error,
+  now = () => new Date(),
   setExitCode = (code) => {
     process.exitCode = code;
   },
@@ -47,7 +49,7 @@ async function main({
       return true;
     }
 
-    const envFile = await loadConfigEnvFile({ cwd, scriptDir });
+    const envFile = await loadConfigEnvFile({ cwd, scriptDir, homeDir });
     const endpoint = getConfigValue('ENDPOINT', envFile, envSource);
     const authHeader = getConfigValue('AUTH_HEADER', envFile, envSource);
 
@@ -86,7 +88,8 @@ async function main({
     }
 
     const balance = extractBalance(summary);
-    log(flags.combined ? formatCombinedBalance(balance) : flags.nanoDollars ? formatNanoDollars(balance) : formatBalance(balance));
+    const output = flags.combined ? formatCombinedBalance(balance) : flags.nanoDollars ? formatNanoDollars(balance) : formatBalance(balance);
+    log(`${now().toISOString()} ${output}`);
     return true;
   } catch (error) {
     fail(error?.message || 'unexpected error', stderr, setExitCode);

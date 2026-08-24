@@ -2,18 +2,30 @@
   "name": "@eliware/openai-balance",
   "version": "1.1.1",
   "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  },
+  "files": [
+    "balance.mjs",
+    "src",
+    "README.md",
+    "RELEASE_NOTES.md",
+    "LICENSE"
+  ],
   "bin": {
     "openai-balance": "./balance.mjs"
   },
   "scripts": {
     "start": "node balance.mjs",
-    "test": "npx --node-options=\"--experimental-vm-modules --no-warnings\" jest --coverage --detectOpenHandles --silent --runInBand",
-    "lint": "oxlint .",
-    "test:gaps": "npm test 2>&1 | grep '|' | grep -vF '|     100 |      100 |     100 |     100 |'"
+    "test": "eliware-test",
+    "lint": "eliware-test --lint",
+    "pack": "npm pack --dry-run"
   },
   "devDependencies": {
-    "jest": "^30.4.2",
-    "oxlint": "^1.73.0"
+    "@eliware/test": "^1.0.3"
   },
   "description": "Display the current OpenAI credit balance in a single terminal line.",
   "keywords": [

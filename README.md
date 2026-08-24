@@ -22,20 +22,29 @@ Options:
 Configuration:
 - ENDPOINT
 - AUTH_HEADER
+- Store these values in the shell environment or a local `.env` file. Never
+  commit `.env` or expose the bearer token in logs, screenshots, or command
+  history.
 
 Precedence:
 1. Shell environment variables
 2. .env in the current working directory
-3. .env in the script directory
+3. .env in `~/.openai-balance/`
+4. .env in the script directory
+
+For a global install, create `~/.openai-balance/.env` (for example,
+`C:\\Users\\you\\.openai-balance\\.env` on Windows or
+`/home/you/.openai-balance/.env` on Linux). Create the directory manually and
+restrict the file so it is readable only by your user.
 
 Example .env:
 - ENDPOINT=https://api.openai.com/v1/dashboard/billing/credit_grants
 - AUTH_HEADER=Bearer your-session-token-here
 
 Output:
-- Success: OpenAI credit balance: $10.16
-- Combined: OpenAI credit balance: $10.16 (10,160,000,000n)
-- Nano dollars: OpenAI credit balance: 10,160,000,000n
+- Success: `2026-08-24T12:34:56.789Z OpenAI credit balance: $10.16`
+- Combined: `2026-08-24T12:34:56.789Z OpenAI credit balance: $10.16 (10,160,000,000n)`
+- Nano dollars: `2026-08-24T12:34:56.789Z OpenAI credit balance: 10,160,000,000n`
 - Summary: a table of credit history rows
 - Version: current package.json version
 - JSON: pretty-printed API response body
@@ -44,6 +53,11 @@ Output:
 - Invalid options: one-line OpenAI credit balance: invalid option(s): ...
 
 The API response should include total_available or total_paid_available for balance mode, and grants.data for summary mode.
+
+Validation:
+- `npm test` runs the baseline tests, coverage gate, and lint.
+- `npm run lint` runs lint only.
+- `npm run pack` previews the files that would be published.
 
 ## Support
 

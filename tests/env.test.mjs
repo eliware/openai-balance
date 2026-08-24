@@ -60,9 +60,25 @@ describe('env helpers', () => {
         await writeEnv(scriptDir, 'ENDPOINT=https://script.example.com\nAUTH_HEADER=Bearer script-token\n');
         await writeEnv(cwd, 'AUTH_HEADER=Bearer cwd-token\n');
 
-        await expect(loadConfigEnvFile({ cwd, scriptDir })).resolves.toEqual({
+        await expect(loadConfigEnvFile({ cwd, scriptDir, homeDir: null })).resolves.toEqual({
           ENDPOINT: 'https://script.example.com',
           AUTH_HEADER: 'Bearer cwd-token'
+        });
+      });
+    });
+  });
+
+  test('loadConfigEnvFile uses the home config between script and working directory', async () => {
+    await withTempDir('openai-balance-', async (cwd) => {
+      await withTempDir('openai-balance-', async (scriptDir) => {
+        await withTempDir('openai-balance-', async (homeDir) => {
+          await writeEnv(scriptDir, 'ENDPOINT=https://script.example.com\nAUTH_HEADER=Bearer script-token\n');
+          await fs.mkdir(path.join(homeDir, '.openai-balance'));
+          await fs.writeFile(path.join(homeDir, '.openai-balance', '.env'), 'AUTH_HEADER=Bearer home-token\n');
+          await expect(loadConfigEnvFile({ cwd, scriptDir, homeDir })).resolves.toEqual({
+            ENDPOINT: 'https://script.example.com',
+            AUTH_HEADER: 'Bearer home-token'
+          });
         });
       });
     });
@@ -76,7 +92,18 @@ describe('env helpers', () => {
     await withTempDir('openai-balance-', async (dir) => {
       await writeEnv(dir, 'ENDPOINT=https://same.example.com\nAUTH_HEADER=Bearer same-token\n');
 
-      await expect(loadConfigEnvFile({ cwd: dir, scriptDir: dir })).resolves.toEqual({
+      await expect(loadConfigEnvFile({ cwd: dir, scriptDir: dir, homeDir: null })).resolves.toEqual({
+        ENDPOINT: 'https://same.example.com',
+        AUTH_HEADER: 'Bearer same-token'
+      });
+    });
+  });
+
+  test('loadConfigEnvFile supports disabling the home config path', async () => {
+    await withTempDir('openai-balance-', async (dir) => {
+      await writeEnv(dir, 'ENDPOINT=https://same.example.com\nAUTH_HEADER=Bearer same-token\n');
+
+      await expect(loadConfigEnvFile({ cwd: dir, scriptDir: dir, homeDir: null })).resolves.toEqual({
         ENDPOINT: 'https://same.example.com',
         AUTH_HEADER: 'Bearer same-token'
       });
