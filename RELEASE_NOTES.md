@@ -1,5 +1,20 @@
 # Release Notes
 
+## 2.0.0 - 2026-08-24
+
+### CI and release security
+
+- Scoped GitHub Actions OIDC (`id-token: write`) permission to the publish job
+  instead of granting it to validation jobs.
+- Kept Ubuntu and Windows validation required before tag-based publication.
+- Standardized package validation on `npm pack --dry-run`.
+
+### Repository maintenance
+
+- Preserved generated Jest result files for local and CI diagnostics.
+- Added stricter agent working rules covering focused changes, uncertainty, and
+  self-verification.
+
 ## 1.1.2 - 2026-08-24
 
 - Aligned test, lint, packaging, documentation, and CI workflows with the
