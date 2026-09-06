@@ -2,6 +2,8 @@
 
 ## @eliware/openai-balance [![npm version](https://img.shields.io/npm/v/@eliware/openai-balance.svg)](https://www.npmjs.com/package/@eliware/openai-balance)[![build status](https://github.com/eliware/openai-balance/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/openai-balance/actions)
 
+Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+
 Prints OpenAI credit information in a terminal-friendly format.
 
 Usage:
