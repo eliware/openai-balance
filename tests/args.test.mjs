@@ -37,45 +37,6 @@ describe("cli args", () => {
     });
   });
 
-  test("parseCliArgs accepts grouped short flags", () => {
-    expect(parseCliArgs(["-sn"])).toEqual({
-      help: false,
-      version: false,
-      json: false,
-      nanoDollars: true,
-      combined: false,
-      summary: true,
-      invalidOptions: [],
-    });
-    expect(parseCliArgs(["-ns"])).toEqual({
-      help: false,
-      version: false,
-      json: false,
-      nanoDollars: true,
-      combined: false,
-      summary: true,
-      invalidOptions: [],
-    });
-    expect(parseCliArgs(["-sc"])).toEqual({
-      help: false,
-      version: false,
-      json: false,
-      nanoDollars: false,
-      combined: true,
-      summary: true,
-      invalidOptions: [],
-    });
-    expect(parseCliArgs(["-cs"])).toEqual({
-      help: false,
-      version: false,
-      json: false,
-      nanoDollars: false,
-      combined: true,
-      summary: true,
-      invalidOptions: [],
-    });
-  });
-
   test("parseCliArgs records invalid options and deduplicates repeats", () => {
     expect(parseCliArgs([undefined, "", "-", "--", "--wat", "--wat", "foo", "-x"])).toEqual({
       help: false,

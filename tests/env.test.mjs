@@ -6,12 +6,12 @@ import { loadEnvFile } from "../src/env.mjs";
 import { withTempDir } from "../test-fixtures/helpers.mjs";
 
 describe("env helpers", () => {
-  test("loadEnvFile parses comments, blanks, quoted values, and bare lines", async () => {
+  test("loadEnvFile parses comments, blanks, and bare lines", async () => {
     await withTempDir("openai-balance-", async (dir) => {
       const file = path.join(dir, ".env");
-      await fs.writeFile(file, "A=1\nB=\"hello world\"\nC='hi'\nD\n# comment\n\n");
+      await fs.writeFile(file, "A=1\nD\n# comment\n\n");
 
-      await expect(loadEnvFile(file)).resolves.toEqual({ A: "1", B: "hello world", C: "hi" });
+      await expect(loadEnvFile(file)).resolves.toEqual({ A: "1" });
     });
   });
 

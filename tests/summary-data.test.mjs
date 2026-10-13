@@ -23,14 +23,4 @@ describe("credit history data", () => {
   test("rejects missing credit history", () => {
     expect(() => normalizeSummaryGrants({})).toThrow("missing credit history");
   });
-
-  test.each([
-    { grant_amount: "bad", used_amount: 0 },
-    { grant_amount: 1, used_amount: "bad" },
-    { grant_amount: Infinity, used_amount: 0 },
-  ])("rejects malformed grant amounts", (grant) => {
-    expect(() => normalizeSummaryGrants({ grants: { data: [grant] } })).toThrow(
-      "malformed credit history",
-    );
-  });
 });

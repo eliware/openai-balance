@@ -1,4 +1,5 @@
 import fs from "node:fs/promises";
+import { unquoteEnvValue } from "./env-value.mjs";
 
 async function loadEnvFile(filePath, readFile = fs.readFile) {
   try {
@@ -17,14 +18,7 @@ async function loadEnvFile(filePath, readFile = fs.readFile) {
       }
 
       const key = line.slice(0, equalsIndex).trim();
-      let value = line.slice(equalsIndex + 1).trim();
-
-      if (
-        (value.startsWith('"') && value.endsWith('"')) ||
-        (value.startsWith("'") && value.endsWith("'"))
-      ) {
-        value = value.slice(1, -1);
-      }
+      const value = unquoteEnvValue(line.slice(equalsIndex + 1).trim());
 
       env[key] = value;
     }

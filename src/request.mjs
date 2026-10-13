@@ -1,8 +1,7 @@
 import process from "node:process";
 
 import { registerSignals } from "@eliware/common";
-
-const signalExitCodes = { SIGINT: 130, SIGTERM: 143, SIGHUP: 129, beforeExit: 0 };
+import { signalExitCodes } from "./signal-exit-codes.mjs";
 
 async function requestSummary(
   endpoint,

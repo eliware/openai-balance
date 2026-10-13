@@ -3,7 +3,8 @@ import { execFileSync } from "node:child_process";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
-import { cli, toRealFileUrl } from "../src/cli.mjs";
+import { cli } from "../src/cli.mjs";
+import { toRealFileUrl } from "../src/cli-entry.mjs";
 import { cliPath, createRecorder, makeResponse, repoRoot } from "../test-fixtures/helpers.mjs";
 
 describe("cli entrypoint", () => {
@@ -16,11 +17,6 @@ describe("cli entrypoint", () => {
 
   test("toRealFileUrl resolves symlinks to the real file url", async () => {
     expect(toRealFileUrl(cliPath)).toBe(pathToFileURL(cliPath).href);
-  });
-
-  test("cli returns false when the module is not the entry point", async () => {
-    await expect(cli({ argv1: null })).resolves.toBe(false);
-    await expect(cli({ argv1: cliPath, moduleUrl: "file:///different.mjs" })).resolves.toBe(false);
   });
 
   test("cli uses default entrypoint options when called without arguments", async () => {

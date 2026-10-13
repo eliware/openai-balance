@@ -1,12 +1,6 @@
-import fsSync from "node:fs";
-import { pathToFileURL } from "node:url";
-
 import { registerCliHandlers } from "./cli-handlers.mjs";
+import { isCliEntryPoint, toRealFileUrl } from "./cli-entry.mjs";
 import { main } from "./main.mjs";
-
-function toRealFileUrl(filePath) {
-  return pathToFileURL(fsSync.realpathSync(filePath)).href;
-}
 
 async function cli({
   argv1 = process.argv[1],
@@ -14,7 +8,7 @@ async function cli({
   argv = [],
   ...mainOptions
 } = {}) {
-  if (argv1 && moduleUrl === toRealFileUrl(argv1)) {
+  if (isCliEntryPoint(argv1, moduleUrl)) {
     const stderr = mainOptions.stderr ?? console.error;
     const setExitCode =
       mainOptions.setExitCode ??
