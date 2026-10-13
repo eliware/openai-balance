@@ -4,8 +4,12 @@ import { formatOutput } from "../src/output-format.mjs";
 
 describe("output formatter", () => {
   test("formats JSON with stable indentation", () => {
-    expect(formatOutput({ balance: 1, grants: { data: [] } }, { json: true })).toBe(
-      '{\n  "balance": 1,\n  "grants": {\n    "data": []\n  }\n}',
+    expect(formatOutput({ total_available: 1, grants: { data: [] } }, { json: true })).toBe(
+      '{\n  "total_available": 1,\n  "grants": {\n    "data": []\n  }\n}',
     );
+  });
+
+  test("rejects JSON data without a numeric balance", () => {
+    expect(() => formatOutput({ grants: { data: [] } }, { json: true })).toThrow("missing balance");
   });
 });

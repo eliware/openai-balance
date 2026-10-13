@@ -18,11 +18,11 @@ describe("credit history formatting", () => {
     expect(output).toContain("1,000,000,000n");
   });
 
-  test("renders invalid dates and finite expiry dates", () => {
+  test("rejects invalid effective dates", () => {
     const summary = {
       grants: { data: [{ effective_at: NaN, expires_at: 1, grant_amount: 1, used_amount: 0 }] },
     };
-    expect(formatSummary(summary)).toContain("-         | 1970-01-01");
+    expect(() => formatSummary(summary)).toThrow("malformed credit history");
   });
 
   test("renders an empty history table", () => {

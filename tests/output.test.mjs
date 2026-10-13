@@ -2,7 +2,10 @@ import { describe, expect, test } from "@jest/globals";
 
 import { printOutput } from "../src/output.mjs";
 
-const summary = { total_available: 1.23, grants: { data: [{ grant_amount: 2, used_amount: 1 }] } };
+const summary = {
+  total_available: 1.23,
+  grants: { data: [{ effective_at: 0, expires_at: null, grant_amount: 2, used_amount: 1 }] },
+};
 
 describe("CLI output modes", () => {
   test.each([

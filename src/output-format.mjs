@@ -6,7 +6,10 @@ function formatOutput(summary, flags) {
   if (flags.summary) {
     return formatSummary(summary, { combined: flags.combined, nanoDollars: flags.nanoDollars });
   }
-  if (flags.json) return JSON.stringify(summary, null, 2);
+  if (flags.json) {
+    extractBalance(summary);
+    return JSON.stringify(summary, null, 2);
+  }
 
   const balance = extractBalance(summary);
   return flags.combined
