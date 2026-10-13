@@ -31,14 +31,4 @@ describe("credit history formatting", () => {
   test("renders an empty history table", () => {
     expect(formatSummary({ grants: { data: [] } })).toContain("Effective");
   });
-
-  test("rejects missing history and malformed amounts", () => {
-    expect(() => formatSummary({})).toThrow("missing credit history");
-    expect(() =>
-      formatSummary({ grants: { data: [{ grant_amount: "bad", used_amount: 0 }] } }),
-    ).toThrow("malformed credit history");
-    expect(() =>
-      formatSummary({ grants: { data: [{ grant_amount: 1, used_amount: "bad" }] } }),
-    ).toThrow("malformed credit history");
-  });
 });

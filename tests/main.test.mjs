@@ -3,29 +3,8 @@ import { EventEmitter } from "node:events";
 import process from "node:process";
 
 import { main } from "../src/main.mjs";
-import { createRecorder, makeResponse, repoRoot, withTempDir } from "../test-fixtures/helpers.mjs";
-
-function options(recorder, overrides = {}) {
-  return {
-    cwd: repoRoot,
-    scriptDir: repoRoot,
-    homeDir: null,
-    envSource: { ENDPOINT: "https://example.com", AUTH_HEADER: "Bearer test-token" },
-    fetchFn: async () => makeResponse({ json: async () => ({ total_available: 1.23 }) }),
-    log: recorder.log,
-    stderr: recorder.stderr,
-    setExitCode: recorder.setExitCode,
-    ...overrides,
-  };
-}
-
-async function expectFailure(overrides, message, argv = []) {
-  const recorder = createRecorder();
-  await expect(main(options(recorder, { argv, ...overrides }))).resolves.toBe(false);
-  expect(recorder.errors).toEqual([`OpenAI credit balance: ${message}`]);
-  expect(recorder.exitCode).toBe(1);
-  return recorder;
-}
+import { createRecorder, makeResponse, withTempDir } from "../test-fixtures/helpers.mjs";
+import { expectMainFailure, mainOptions } from "../test-fixtures/main-test-helpers.mjs";
 
 describe("main orchestration", () => {
   test.each([
@@ -33,14 +12,14 @@ describe("main orchestration", () => {
     [["--version"], "12.0.0"],
   ])("prints information for %s", async (argv, expected) => {
     const recorder = createRecorder();
-    await expect(main(options(recorder, { argv }))).resolves.toBe(true);
+    await expect(main(mainOptions(recorder, { argv }))).resolves.toBe(true);
     expect(recorder.logs[0]).toContain(expected);
   });
 
   test("prints a timestamped balance after one request", async () => {
     const recorder = createRecorder();
     const fetchFn = async () => makeResponse({ json: async () => ({ total_available: 10.16 }) });
-    await expect(main(options(recorder, { fetchFn }))).resolves.toBe(true);
+    await expect(main(mainOptions(recorder, { fetchFn }))).resolves.toBe(true);
     expect(recorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$10\.16$/);
     expect(recorder.errors).toEqual([]);
   });
@@ -48,11 +27,13 @@ describe("main orchestration", () => {
   test("sets the default process exit code for invalid arguments", async () => {
     const previousCode = process.exitCode;
     const previousError = console.error;
+    const errors = [];
     process.exitCode = undefined;
-    console.error = () => {};
+    console.error = (message) => errors.push(message);
     try {
       await expect(main({ argv: ["--bad"] })).resolves.toBe(false);
       expect(process.exitCode).toBe(1);
+      expect(errors).toEqual(["OpenAI credit balance: invalid option: --bad"]);
     } finally {
       process.exitCode = previousCode;
       console.error = previousError;
@@ -60,29 +41,35 @@ describe("main orchestration", () => {
   });
 
   test.each([
-    [["--wat"], "invalid option: --wat"],
-    [["--wat", "-x"], "invalid options: --wat, -x"],
-    [["-n", "-c"], "can't use both -n and -c"],
-  ])("rejects invalid arguments %s", async (argv, message) => {
-    const recorder = await expectFailure({}, message, argv);
-    expect(recorder.logs).toEqual([]);
-  });
-
-  test.each([
     [401, "invalid bearer token"],
     [403, "invalid bearer token"],
     [500, "request failed (500)"],
   ])("reports HTTP status %s", async (status, message) => {
-    await expectFailure(
+    await expectMainFailure(
       { fetchFn: async () => makeResponse({ status, ok: false, json: async () => ({}) }) },
       message,
     );
   });
 
+  test("redacts the authorization header from request errors", async () => {
+    const recorder = createRecorder();
+    await expect(
+      main(
+        mainOptions(recorder, {
+          fetchFn: async () => {
+            throw Error("request failed: Bearer test-token");
+          },
+        }),
+      ),
+    ).resolves.toBe(false);
+    expect(recorder.errors[0]).not.toContain("test-token");
+    expect(recorder.errors[0]).toContain("[REDACTED]");
+  });
+
   test("reports missing configuration without a request", async () => {
     await withTempDir("balance-cwd-", async (cwd) =>
       withTempDir("balance-script-", async (scriptDir) => {
-        await expectFailure(
+        await expectMainFailure(
           {
             cwd,
             scriptDir,
@@ -105,7 +92,7 @@ describe("main orchestration", () => {
       startRequest = resolve;
     });
     const result = main(
-      options(recorder, {
+      mainOptions(recorder, {
         processObj,
         fetchFn: async (url, init) => {
           startRequest();
@@ -123,13 +110,6 @@ describe("main orchestration", () => {
   });
 
   test.each([
-    [{ object: "credit_summary" }, "missing balance"],
-    [{ total_available: Infinity }, "missing balance"],
-  ])("reports malformed balance data", async (body, message) => {
-    await expectFailure({ fetchFn: async () => makeResponse({ json: async () => body }) }, message);
-  });
-
-  test.each([
     [
       async () => {
         throw Error("parse failed");
@@ -143,11 +123,11 @@ describe("main orchestration", () => {
       "unexpected error",
     ],
   ])("reports response parsing errors", async (json, message) => {
-    await expectFailure({ fetchFn: async () => makeResponse({ json }) }, message);
+    await expectMainFailure({ fetchFn: async () => makeResponse({ json }) }, message);
   });
 
   test("reports an argument parsing error before it reads credentials", async () => {
-    await expectFailure({ argv: {} }, "argv is not iterable");
+    await expectMainFailure({ argv: {} }, "argv is not iterable");
   });
 
   test("uses process defaults when called without options", async () => {

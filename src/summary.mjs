@@ -1,4 +1,5 @@
 import { formatNanoValue, formatUsd } from "./format-utils.mjs";
+import { normalizeSummaryGrants } from "./summary-data.mjs";
 import { formatTable } from "./table.mjs";
 
 function formatDate(seconds) {
@@ -14,34 +15,27 @@ function formatExpiry(seconds) {
 }
 
 function formatSummary(summary, { combined = false, nanoDollars = false } = {}) {
-  const grants = summary?.grants?.data;
-  if (!Array.isArray(grants)) throw new Error("missing credit history");
-
+  const grants = normalizeSummaryGrants(summary);
   const rows = grants.map((grant) => {
-    const granted = Number(grant.grant_amount);
-    const used = Number(grant.used_amount);
-    if (!Number.isFinite(granted) || !Number.isFinite(used))
-      throw new Error("malformed credit history");
-    const available = granted - used;
     if (combined) {
       return [
-        formatDate(grant.effective_at),
-        formatExpiry(grant.expires_at),
-        formatUsd(granted),
-        formatNanoValue(granted),
-        formatUsd(used),
-        formatNanoValue(used),
-        formatUsd(available),
-        formatNanoValue(available),
+        formatDate(grant.effectiveAt),
+        formatExpiry(grant.expiresAt),
+        formatUsd(grant.granted),
+        formatNanoValue(grant.granted),
+        formatUsd(grant.used),
+        formatNanoValue(grant.used),
+        formatUsd(grant.available),
+        formatNanoValue(grant.available),
       ];
     }
     const formatAmount = nanoDollars ? formatNanoValue : formatUsd;
     return [
-      formatDate(grant.effective_at),
-      formatExpiry(grant.expires_at),
-      formatAmount(granted),
-      formatAmount(used),
-      formatAmount(available),
+      formatDate(grant.effectiveAt),
+      formatExpiry(grant.expiresAt),
+      formatAmount(grant.granted),
+      formatAmount(grant.used),
+      formatAmount(grant.available),
     ];
   });
 

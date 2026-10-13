@@ -1,11 +1,12 @@
-import { redactText } from "@eliware/common";
 import { parseCliArgs } from "./args.mjs";
 import { getConfigValue, loadConfigEnvFile } from "./config.mjs";
+import { validateCliFlags } from "./cli-validation.mjs";
 import { formatHelp } from "./format.mjs";
 import { fail } from "./fail.mjs";
 import { printOutput } from "./output.mjs";
 import { projectRoot } from "./paths.mjs";
 import { requestSummary } from "./request.mjs";
+import { redactErrorMessage } from "./redaction.mjs";
 import { loadPackageVersion } from "./version.mjs";
 
 async function main({
@@ -29,15 +30,9 @@ async function main({
   try {
     const flags = parseCliArgs(argv);
 
-    if (flags.invalidOptions.length > 0) {
-      reportFailure(
-        `invalid option${flags.invalidOptions.length === 1 ? "" : "s"}: ${flags.invalidOptions.join(", ")}`,
-      );
-      return false;
-    }
-
-    if (flags.nanoDollars && flags.combined) {
-      reportFailure("can't use both -n and -c");
+    const validationError = validateCliFlags(flags);
+    if (validationError) {
+      reportFailure(validationError);
       return false;
     }
 
@@ -81,10 +76,7 @@ async function main({
 
     return printOutput(summary, flags, { log, now });
   } catch (error) {
-    const message = redactText(error?.message || "unexpected error", {
-      secrets: authHeader ? [authHeader] : [],
-    });
-    reportFailure(message);
+    reportFailure(redactErrorMessage(error, authHeader));
     return false;
   }
 }
