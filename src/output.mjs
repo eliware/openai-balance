@@ -1,4 +1,5 @@
 import { formatOutput } from "./output-format.mjs";
+import { formatTimestampedOutput } from "./output-timestamp.mjs";
 
 function printOutput(summary, flags, { log = console.log, now = () => new Date() } = {}) {
   const output = formatOutput(summary, flags);
@@ -6,7 +7,7 @@ function printOutput(summary, flags, { log = console.log, now = () => new Date()
     log(output);
     return true;
   }
-  log(`${now().toISOString()} ${output}`);
+  log(formatTimestampedOutput(output, now));
   return true;
 }
 

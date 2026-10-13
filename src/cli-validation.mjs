@@ -1,11 +1,9 @@
-import { formatConflictingFlags, formatInvalidOptions } from "./cli-validation-message.mjs";
-
 function validateCliFlags(flags) {
   if (flags.invalidOptions.length > 0) {
-    return formatInvalidOptions(flags.invalidOptions);
+    return `invalid option${flags.invalidOptions.length === 1 ? "" : "s"}: ${flags.invalidOptions.join(", ")}`;
   }
 
-  if (flags.nanoDollars && flags.combined) return formatConflictingFlags();
+  if (flags.nanoDollars && flags.combined) return "can't use both -n and -c";
   return null;
 }
 

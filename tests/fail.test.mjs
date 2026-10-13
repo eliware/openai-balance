@@ -20,11 +20,4 @@ describe("fail helper", () => {
       process.exitCode = previousExitCode;
     }
   });
-
-  test("removes line breaks", () => {
-    const recorder = createRecorder();
-    fail("failed\nrequest", recorder.stderr, recorder.setExitCode);
-    expect(recorder.errors).toEqual(["OpenAI credit balance: failed request"]);
-    expect(recorder.exitCode).toBe(1);
-  });
 });

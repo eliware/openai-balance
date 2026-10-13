@@ -37,6 +37,14 @@ describe("cli args", () => {
     });
   });
 
+  test("parseCliArgs expands grouped short flags and records unknown flags", () => {
+    expect(parseCliArgs(["-snx"])).toMatchObject({
+      nanoDollars: true,
+      summary: true,
+      invalidOptions: ["-x"],
+    });
+  });
+
   test("parseCliArgs records invalid options and deduplicates repeats", () => {
     expect(parseCliArgs([undefined, "", "-", "--", "--wat", "--wat", "foo", "-x"])).toEqual({
       help: false,
