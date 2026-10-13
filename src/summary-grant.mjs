@@ -1,9 +1,7 @@
+import { normalizeGrantAmounts } from "./summary-grant-amount.mjs";
+
 function normalizeSummaryGrant(grant) {
-  const granted = Number(grant.grant_amount);
-  const used = Number(grant.used_amount);
-  if (!Number.isFinite(granted) || !Number.isFinite(used)) {
-    throw new Error("malformed credit history");
-  }
+  const { granted, used } = normalizeGrantAmounts(grant);
 
   return {
     effectiveAt: grant.effective_at,

@@ -1,4 +1,5 @@
-import { formatDate, formatExpiry } from "./date-format.mjs";
+import { formatDate } from "./date-format.mjs";
+import { formatExpiry } from "./expiry-format.mjs";
 import { formatUsd } from "./format-utils.mjs";
 import { formatNanoValue } from "./nano-dollar-format.mjs";
 

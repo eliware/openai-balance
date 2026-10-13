@@ -1,4 +1,5 @@
-import { formatDate, formatExpiry } from "./date-format.mjs";
+import { formatDate } from "./date-format.mjs";
+import { formatExpiry } from "./expiry-format.mjs";
 import { formatNanoValue } from "./nano-dollar-format.mjs";
 
 function formatNanoRows(grants) {

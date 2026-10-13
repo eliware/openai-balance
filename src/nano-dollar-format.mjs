@@ -1,5 +1,7 @@
+import { toNanoDollars } from "./nano-dollar-value.mjs";
+
 function formatNanoValue(amount) {
-  const nanoDollars = Math.round(amount * 1_000_000_000);
+  const nanoDollars = toNanoDollars(amount);
   return `${new Intl.NumberFormat("en-US").format(nanoDollars)}n`;
 }
 

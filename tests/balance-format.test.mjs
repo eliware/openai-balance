@@ -1,19 +1,19 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { formatBalance, formatCombinedBalance, formatNanoDollars } from "../src/format.mjs";
+import { formatBalance, formatCombinedBalance, formatNanoDollars } from "../src/balance-format.mjs";
 
-describe("format helpers", () => {
-  test("formatBalance renders USD with two decimals", () => {
+describe("balance output formatters", () => {
+  test("formats USD", () => {
     expect(formatBalance(10.163356375)).toBe("OpenAI credit balance: $10.16");
   });
 
-  test("formatCombinedBalance renders both USD and nano dollars", () => {
+  test("formats USD and nano-dollars", () => {
     expect(formatCombinedBalance(10.163356375)).toBe(
       "OpenAI credit balance: $10.16 (10,163,356,375n)",
     );
   });
 
-  test("formatNanoDollars renders comma-separated nano dollars", () => {
+  test("formats nano-dollars", () => {
     expect(formatNanoDollars(10.163356375)).toBe("OpenAI credit balance: 10,163,356,375n");
   });
 });

@@ -1,4 +1,4 @@
-import { formatHelp } from "./format.mjs";
+import { formatHelp } from "./help-format.mjs";
 import { loadPackageVersion } from "./version-loader.mjs";
 
 async function runCliCommand(flags, { scriptDir, log = console.log } = {}) {

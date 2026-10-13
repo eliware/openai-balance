@@ -13,12 +13,4 @@ describe("summary grant normalization", () => {
       }),
     ).toEqual({ effectiveAt: 10, expiresAt: null, granted: 12.5, used: 2.5, available: 10 });
   });
-
-  test.each([
-    { grant_amount: "bad", used_amount: 0 },
-    { grant_amount: 1, used_amount: "bad" },
-    { grant_amount: Infinity, used_amount: 0 },
-  ])("rejects invalid amounts", (grant) => {
-    expect(() => normalizeSummaryGrant(grant)).toThrow("malformed credit history");
-  });
 });

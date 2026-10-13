@@ -1,5 +1,5 @@
 import { extractBalance } from "./balance.mjs";
-import { formatBalance, formatCombinedBalance, formatNanoDollars } from "./format.mjs";
+import { formatBalance, formatCombinedBalance, formatNanoDollars } from "./balance-format.mjs";
 import { formatSummary } from "./summary.mjs";
 
 function formatOutput(summary, flags) {

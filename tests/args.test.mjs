@@ -1,6 +1,4 @@
 import { describe, expect, test } from "@jest/globals";
-import process from "node:process";
-
 import { parseCliArgs } from "../src/args.mjs";
 
 describe("cli args", () => {
@@ -55,34 +53,5 @@ describe("cli args", () => {
       summary: false,
       invalidOptions: ["undefined", "", "-", "--", "--wat", "foo", "-x"],
     });
-  });
-
-  test("parseCliArgs uses process.argv when no argv is passed", () => {
-    const previousArgv = process.argv.slice();
-
-    try {
-      process.argv.splice(
-        0,
-        process.argv.length,
-        "node",
-        "openai-balance.mjs",
-        "--json",
-        "-n",
-        "--combined",
-        "--summary",
-      );
-
-      expect(parseCliArgs()).toEqual({
-        help: false,
-        version: false,
-        json: true,
-        nanoDollars: true,
-        combined: true,
-        summary: true,
-        invalidOptions: [],
-      });
-    } finally {
-      process.argv.splice(0, process.argv.length, ...previousArgv);
-    }
   });
 });

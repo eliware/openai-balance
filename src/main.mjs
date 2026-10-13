@@ -1,5 +1,6 @@
 import { parseCliArgs } from "./args.mjs";
-import { getConfigValue, loadConfigEnvFile } from "./config.mjs";
+import { loadConfigEnvFile } from "./config.mjs";
+import { getConfigValue } from "./config-values.mjs";
 import { validateCliFlags } from "./cli-validation.mjs";
 import { runCliCommand } from "./cli-command.mjs";
 import { fail } from "./fail.mjs";
@@ -7,8 +8,7 @@ import { printOutput } from "./output.mjs";
 import { projectRoot } from "./paths.mjs";
 import { requestSummary } from "./request.mjs";
 import { redactErrorMessage } from "./redaction.mjs";
-import { readResponseBody } from "./response.mjs";
-import { getResponseError } from "./response-status.mjs";
+import { processResponse } from "./response-processing.mjs";
 
 async function main({
   cwd = process.cwd(),
@@ -55,15 +55,13 @@ async function main({
     });
     if (response === null) return false;
 
-    const responseError = getResponseError(response);
-    if (responseError) {
-      reportFailure(responseError);
+    const result = await processResponse(response);
+    if (result.error) {
+      reportFailure(result.error);
       return false;
     }
 
-    const summary = await readResponseBody(response);
-
-    return printOutput(summary, flags, { log, now });
+    return printOutput(result.summary, flags, { log, now });
   } catch (error) {
     reportFailure(redactErrorMessage(error, authHeader));
     return false;
