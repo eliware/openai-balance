@@ -11,5 +11,5 @@ export {
 } from "./format.mjs";
 export { cli, toRealFileUrl } from "./cli.mjs";
 export { fail, main } from "./main.mjs";
-export { loadPackageVersion } from "./version.mjs";
+export { loadPackageVersion } from "./version-loader.mjs";
 export { projectRoot, srcDir } from "./paths.mjs";

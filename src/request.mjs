@@ -1,8 +1,7 @@
 import process from "node:process";
 
-import { registerSignals } from "@eliware/common";
 import { fetchSummary } from "./fetch-summary.mjs";
-import { signalExitCodes } from "./signal-exit-codes.mjs";
+import { registerRequestCancellation } from "./request-cancellation.mjs";
 
 async function requestSummary(
   endpoint,
@@ -15,28 +14,21 @@ async function requestSummary(
     },
   } = {},
 ) {
-  const abortController = new AbortController();
-  let interrupted = false;
-  const lifecycle = registerSignals({
+  const cancellation = registerRequestCancellation({
     processObj,
-    exit: false,
-    shutdownHook: (signalName) => {
-      interrupted = true;
-      setExitCode(signalExitCodes[signalName]);
-      abortController.abort();
-    },
+    setExitCode,
   });
 
   try {
     return await fetchSummary(endpoint, authHeader, {
-      signal: abortController.signal,
+      signal: cancellation.signal,
       fetchFn,
     });
   } catch (error) {
-    if (interrupted) return null;
+    if (cancellation.wasInterrupted()) return null;
     throw error;
   } finally {
-    lifecycle.removeHandlers();
+    cancellation.removeHandlers();
   }
 }
 

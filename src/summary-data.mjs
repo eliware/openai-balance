@@ -1,10 +1,8 @@
 import { normalizeSummaryGrant } from "./summary-grant.mjs";
+import { getSummaryGrants } from "./summary-validation.mjs";
 
 function normalizeSummaryGrants(summary) {
-  const grants = summary?.grants?.data;
-  if (!Array.isArray(grants)) throw new Error("missing credit history");
-
-  return grants.map(normalizeSummaryGrant);
+  return getSummaryGrants(summary).map(normalizeSummaryGrant);
 }
 
 export { normalizeSummaryGrants };

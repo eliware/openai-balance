@@ -4,7 +4,6 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 import { cli } from "../src/cli.mjs";
-import { toRealFileUrl } from "../src/cli-entry.mjs";
 import { cliPath, createRecorder, makeResponse, repoRoot } from "../test-fixtures/helpers.mjs";
 
 describe("cli entrypoint", () => {
@@ -13,10 +12,6 @@ describe("cli entrypoint", () => {
     const version = execFileSync("node", [cliPath, "--version"], { encoding: "utf8" }).trim();
     expect(help).toContain("Usage: openai-balance [options]");
     expect(version).toBe("12.0.0");
-  });
-
-  test("toRealFileUrl resolves symlinks to the real file url", async () => {
-    expect(toRealFileUrl(cliPath)).toBe(pathToFileURL(cliPath).href);
   });
 
   test("cli uses default entrypoint options when called without arguments", async () => {

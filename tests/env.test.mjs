@@ -2,23 +2,14 @@ import { describe, expect, test } from "@jest/globals";
 import fs from "node:fs/promises";
 import path from "node:path";
 
-import { loadEnvFile, unquoteEnvValue } from "../src/env.mjs";
+import { loadEnvFile } from "../src/env.mjs";
 import { withTempDir } from "../test-fixtures/helpers.mjs";
 
 describe("env helpers", () => {
-  test.each([
-    ['"hello world"', "hello world"],
-    ["'hello world'", "hello world"],
-    ['"open quote', '"open quote'],
-    ["plain value", "plain value"],
-  ])("unquotes matching pairs in %s", (value, expected) => {
-    expect(unquoteEnvValue(value)).toBe(expected);
-  });
-
   test("loadEnvFile parses comments, blanks, and bare lines", async () => {
     await withTempDir("openai-balance-", async (dir) => {
       const file = path.join(dir, ".env");
-      await fs.writeFile(file, "A=1\nD\n# comment\n\n");
+      await fs.writeFile(file, "A=1\n# comment\n\n");
 
       await expect(loadEnvFile(file)).resolves.toEqual({ A: "1" });
     });

@@ -1,4 +1,5 @@
-import { formatNanoValue, formatUsd } from "./format-utils.mjs";
+import { formatUsd } from "./format-utils.mjs";
+import { formatNanoValue } from "./nano-dollar-format.mjs";
 import { formatSummary } from "./summary.mjs";
 import { formatHelp } from "./help-format.mjs";
 

@@ -8,6 +8,7 @@ import { projectRoot } from "./paths.mjs";
 import { requestSummary } from "./request.mjs";
 import { redactErrorMessage } from "./redaction.mjs";
 import { readResponseBody } from "./response.mjs";
+import { getResponseError } from "./response-status.mjs";
 
 async function main({
   cwd = process.cwd(),
@@ -54,13 +55,9 @@ async function main({
     });
     if (response === null) return false;
 
-    if (response.status === 401 || response.status === 403) {
-      reportFailure("invalid bearer token");
-      return false;
-    }
-
-    if (!response.ok) {
-      reportFailure(`request failed (${response.status})`);
+    const responseError = getResponseError(response);
+    if (responseError) {
+      reportFailure(responseError);
       return false;
     }
 

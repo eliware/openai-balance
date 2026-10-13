@@ -1,5 +1,6 @@
 import { formatDate, formatExpiry } from "./date-format.mjs";
-import { formatNanoValue, formatUsd } from "./format-utils.mjs";
+import { formatUsd } from "./format-utils.mjs";
+import { formatNanoValue } from "./nano-dollar-format.mjs";
 
 function formatCombinedRows(grants) {
   return {

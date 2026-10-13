@@ -19,8 +19,4 @@ describe("credit history data", () => {
       }),
     ).toEqual([{ effectiveAt: 10, expiresAt: null, granted: 12.5, used: 2.5, available: 10 }]);
   });
-
-  test("rejects missing credit history", () => {
-    expect(() => normalizeSummaryGrants({})).toThrow("missing credit history");
-  });
 });

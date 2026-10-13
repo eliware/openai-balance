@@ -1,6 +1,7 @@
 import process from "node:process";
 
 import { registerHandlers } from "@eliware/common";
+import { createCliHandlerPolicy } from "./cli-handler-policy.mjs";
 
 function registerCliHandlers({
   processObj = process,
@@ -12,16 +13,7 @@ function registerCliHandlers({
   return registerHandlers({
     processObj,
     events: ["uncaughtException", "unhandledRejection", "warning"],
-    log: {
-      debug() {},
-      warn(message) {
-        stderr(`OpenAI credit balance: ${message}`);
-      },
-      error(message) {
-        stderr(`OpenAI credit balance: ${message}`);
-        setExitCode(1);
-      },
-    },
+    log: createCliHandlerPolicy({ stderr, setExitCode }),
   });
 }
 
