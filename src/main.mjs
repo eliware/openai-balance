@@ -1,13 +1,13 @@
 import { parseCliArgs } from "./args.mjs";
 import { getConfigValue, loadConfigEnvFile } from "./config.mjs";
 import { validateCliFlags } from "./cli-validation.mjs";
-import { formatHelp } from "./format.mjs";
+import { runCliCommand } from "./cli-command.mjs";
 import { fail } from "./fail.mjs";
 import { printOutput } from "./output.mjs";
 import { projectRoot } from "./paths.mjs";
 import { requestSummary } from "./request.mjs";
 import { redactErrorMessage } from "./redaction.mjs";
-import { loadPackageVersion } from "./version.mjs";
+import { readResponseBody } from "./response.mjs";
 
 async function main({
   cwd = process.cwd(),
@@ -36,15 +36,7 @@ async function main({
       return false;
     }
 
-    if (flags.help) {
-      log(formatHelp());
-      return true;
-    }
-
-    if (flags.version) {
-      log(await loadPackageVersion({ scriptDir }));
-      return true;
-    }
+    if (await runCliCommand(flags, { scriptDir, log })) return true;
 
     const envFile = await loadConfigEnvFile({ cwd, scriptDir, homeDir });
     const endpoint = getConfigValue("ENDPOINT", envFile, envSource);
@@ -72,7 +64,7 @@ async function main({
       return false;
     }
 
-    const summary = await response.json();
+    const summary = await readResponseBody(response);
 
     return printOutput(summary, flags, { log, now });
   } catch (error) {

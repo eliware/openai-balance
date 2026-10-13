@@ -1,18 +1,7 @@
 import { formatNanoValue, formatUsd } from "./format-utils.mjs";
+import { formatDate, formatExpiry } from "./date-format.mjs";
 import { normalizeSummaryGrants } from "./summary-data.mjs";
 import { formatTable } from "./table.mjs";
-
-function formatDate(seconds) {
-  if (typeof seconds !== "number" || Number.isNaN(seconds)) {
-    return "-";
-  }
-
-  return new Date(seconds * 1000).toISOString().slice(0, 10);
-}
-
-function formatExpiry(seconds) {
-  return seconds == null ? "never" : formatDate(seconds);
-}
 
 function formatSummary(summary, { combined = false, nanoDollars = false } = {}) {
   const grants = normalizeSummaryGrants(summary);
