@@ -4,6 +4,7 @@ import { getConfigValue } from "./config-values.mjs";
 import { handleCliValidation } from "./cli-validation-handler.mjs";
 import { runCliCommand } from "./cli-command.mjs";
 import { fail } from "./fail.mjs";
+import { isHttpsEndpoint } from "./https-endpoint.mjs";
 import { printOutput } from "./output.mjs";
 import { projectRoot } from "./paths.mjs";
 import { requestSummary } from "./request.mjs";
@@ -41,6 +42,10 @@ async function main({
 
     if (!endpoint || !authHeader) {
       reportFailure("missing ENDPOINT or AUTH_HEADER");
+      return false;
+    }
+    if (!isHttpsEndpoint(endpoint)) {
+      reportFailure("ENDPOINT must be a valid HTTPS URL");
       return false;
     }
 

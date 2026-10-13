@@ -16,6 +16,7 @@
 - Split CLI, configuration, request, output, summary, and error tasks into focused modules.
 - Require numeric balance data for JSON output.
 - Require valid grant dates before summary output.
+- Require a valid HTTPS URL for `ENDPOINT` before sending credentials.
 - Ignore invalid environment variable names in `.env` files.
 - Update package checks and CI workflows to use Eliware conventions.
 - Update `@eliware/common` and `@eliware/test` to version 12.

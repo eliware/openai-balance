@@ -84,6 +84,30 @@ describe("main orchestration", () => {
     );
   });
 
+  test.each(["http://example.com", "invalid endpoint"])(
+    "rejects unsafe endpoint %s before a request",
+    async (endpoint) => {
+      const recorder = createRecorder();
+      let requestCount = 0;
+      await expect(
+        main(
+          mainOptions(recorder, {
+            envSource: { ENDPOINT: endpoint, AUTH_HEADER: "Bearer private-token" },
+            fetchFn: async () => {
+              requestCount += 1;
+              return makeResponse({ json: async () => ({ total_available: 1 }) });
+            },
+          }),
+        ),
+      ).resolves.toBe(false);
+      expect(requestCount).toBe(0);
+      expect(recorder.errors).toEqual([
+        "OpenAI credit balance: ENDPOINT must be a valid HTTPS URL",
+      ]);
+      expect(recorder.errors.join(" ")).not.toContain("private-token");
+    },
+  );
+
   test("returns false after a shutdown signal aborts the request", async () => {
     const recorder = createRecorder();
     const processObj = new EventEmitter();
