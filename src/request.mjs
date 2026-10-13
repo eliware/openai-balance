@@ -1,6 +1,7 @@
 import process from "node:process";
 
 import { registerSignals } from "@eliware/common";
+import { fetchSummary } from "./fetch-summary.mjs";
 import { signalExitCodes } from "./signal-exit-codes.mjs";
 
 async function requestSummary(
@@ -27,9 +28,9 @@ async function requestSummary(
   });
 
   try {
-    return await fetchFn(endpoint, {
-      headers: { Authorization: authHeader, Accept: "application/json" },
+    return await fetchSummary(endpoint, authHeader, {
       signal: abortController.signal,
+      fetchFn,
     });
   } catch (error) {
     if (interrupted) return null;

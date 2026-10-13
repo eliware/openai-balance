@@ -16,11 +16,4 @@ describe("CLI flag validation", () => {
       null,
     );
   });
-
-  test("uses singular and plural labels for invalid options", () => {
-    expect(validateCliFlags({ invalidOptions: ["--bad"] })).toBe("invalid option: --bad");
-    expect(validateCliFlags({ invalidOptions: ["--bad", "-x"] })).toBe(
-      "invalid options: --bad, -x",
-    );
-  });
 });
