@@ -1,6 +1,6 @@
 import { redactText } from "@eliware/common";
 import { parseCliArgs } from "./args.mjs";
-import { getConfigValue, loadConfigEnvFile } from "./env.mjs";
+import { getConfigValue, loadConfigEnvFile } from "./config.mjs";
 import { formatHelp } from "./format.mjs";
 import { fail } from "./fail.mjs";
 import { printOutput } from "./output.mjs";

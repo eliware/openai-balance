@@ -1,32 +1,12 @@
 import process from "node:process";
 
-const shortFlagMap = {
-  h: "help",
-  v: "version",
-  j: "json",
-  n: "nanoDollars",
-  c: "combined",
-  s: "summary",
-};
+import { cliOptions, createDefaultFlags } from "./options.mjs";
 
-const longFlagMap = {
-  "--help": "help",
-  "--version": "version",
-  "--json": "json",
-  "--nano-dollars": "nanoDollars",
-  "--combined": "combined",
-  "--summary": "summary",
-};
+const shortFlagMap = Object.fromEntries(cliOptions.map(({ name, short }) => [short, name]));
+const longFlagMap = Object.fromEntries(cliOptions.map(({ name, long }) => [long, name]));
 
 function parseCliArgs(argv = process.argv.slice(2)) {
-  const flags = {
-    help: false,
-    version: false,
-    json: false,
-    nanoDollars: false,
-    combined: false,
-    summary: false,
-  };
+  const flags = createDefaultFlags();
   const invalidOptions = [];
 
   const addInvalid = (option) => {

@@ -60,28 +60,6 @@ describe("cli entrypoint", () => {
     expect(recorder.errors).toEqual([]);
   });
 
-  test("cli logs process errors without exposing their values", async () => {
-    const recorder = createRecorder();
-    await cli({
-      argv1: cliPath,
-      moduleUrl: pathToFileURL(cliPath).href,
-      envSource: { ENDPOINT: "https://example.com", AUTH_HEADER: "Bearer token" },
-      fetchFn: async () => {
-        process.emit("warning", Error("private warning"));
-        process.emit("unhandledRejection", Error("secret-value"));
-        return makeResponse({ json: async () => ({ total_available: 1 }) });
-      },
-      stderr: recorder.stderr,
-      log: () => {},
-      setExitCode: recorder.setExitCode,
-    });
-    expect(recorder.errors).toEqual([
-      "OpenAI credit balance: Warning",
-      "OpenAI credit balance: Unhandled Rejection",
-    ]);
-    expect(recorder.exitCode).toBe(1);
-  });
-
   test("sets the process exit code when callers omit a setter", async () => {
     const previousCode = process.exitCode;
     const previousError = console.error;

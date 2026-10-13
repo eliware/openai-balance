@@ -1,6 +1,7 @@
 export { extractBalance } from "./balance.mjs";
 export { parseCliArgs } from "./args.mjs";
-export { getConfigValue, loadConfigEnvFile, loadEnvFile } from "./env.mjs";
+export { getConfigValue, loadConfigEnvFile } from "./config.mjs";
+export { loadEnvFile } from "./env.mjs";
 export {
   formatBalance,
   formatCombinedBalance,

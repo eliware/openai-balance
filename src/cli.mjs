@@ -1,7 +1,7 @@
 import fsSync from "node:fs";
 import { pathToFileURL } from "node:url";
 
-import { registerHandlers } from "@eliware/common";
+import { registerCliHandlers } from "./cli-handlers.mjs";
 import { main } from "./main.mjs";
 
 function toRealFileUrl(filePath) {
@@ -21,19 +21,7 @@ async function cli({
       ((code) => {
         process.exitCode = code;
       });
-    const handlers = registerHandlers({
-      events: ["uncaughtException", "unhandledRejection", "warning"],
-      log: {
-        debug() {},
-        warn(message) {
-          stderr(`OpenAI credit balance: ${message}`);
-        },
-        error(message) {
-          stderr(`OpenAI credit balance: ${message}`);
-          setExitCode(1);
-        },
-      },
-    });
+    const handlers = registerCliHandlers({ stderr, setExitCode });
     try {
       await main({ ...mainOptions, setExitCode, argv });
       return true;
