@@ -4,22 +4,26 @@
 
 ### Added
 
-- Abort the active request after SIGINT, SIGTERM, or SIGHUP.
-- Add end-user guides for setup, configuration, output, and common errors.
-- Add shared signal, path, redaction, and process-handler support from `@eliware/common`.
-- Add tests for every source module and the supported CLI behavior.
+- Abort active requests after SIGINT, SIGTERM, or SIGHUP.
+- Add setup, configuration, usage, and troubleshooting guides.
+- Add an example, repository specifications, and documentation indexes.
+- Use shared path, redaction, and signal APIs from `@eliware/common`.
+- Add focused tests for source modules and CLI behavior.
 
 ### Changed
 
 - Move the CLI launcher to `bin/openai-balance.mjs`.
-- Split request, output, summary, and error work into focused modules.
-- Update package checks and CI workflows to use the shared Eliware conventions.
+- Split CLI, configuration, request, output, summary, and error tasks into focused modules.
+- Require numeric balance data for JSON output.
+- Require valid grant dates before summary output.
+- Ignore invalid environment variable names in `.env` files.
+- Update package checks and CI workflows to use Eliware conventions.
 - Update `@eliware/common` and `@eliware/test` to version 12.
-- Add the Knit deployment workflow for the canonical package path.
-- Add repository specifications and indexes for docs, examples, and specifications.
+- Add the Knit deployment workflow for `/eliware/openai-balance`.
 
 ### Fixed
 
+- Return a clear error for invalid balance and grant data.
 - Redact credentials from unexpected error messages.
 - Return signal-specific exit codes and remove process handlers after each CLI run.
 
