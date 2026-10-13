@@ -1,86 +1,107 @@
 # [![eliware.org](https://eliware.org/logos/brand.png)](https://discord.gg/M6aTR9eTwN)
 
-## @eliware/openai-balance [![npm version](https://img.shields.io/npm/v/@eliware/openai-balance.svg)](https://www.npmjs.com/package/@eliware/openai-balance)[![build status](https://github.com/eliware/openai-balance/actions/workflows/nodejs.yml/badge.svg)](https://github.com/eliware/openai-balance/actions)
+## @eliware/openai-balance [![npm](https://img.shields.io/npm/v/@eliware/openai-balance)](https://www.npmjs.com/package/@eliware/openai-balance) [![License](https://img.shields.io/github/license/eliware/openai-balance)](https://github.com/eliware/openai-balance/blob/main/LICENSE) [![CI](https://github.com/eliware/openai-balance/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/openai-balance/actions/workflows/ci.yaml)
 
-Documentation: [docs](docs/README.md) · [specifications](specs/README.md) · [examples](examples/README.md)
+Display the current OpenAI credit balance in a single terminal line.
 
-Prints OpenAI credit information in a terminal-friendly format.
+## Table of Contents
 
-Usage:
-- npm start
-- ./balance.mjs
-- npx @eliware/openai-balance
+- [Features](#features)
+- [Requirements](#requirements)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Development](#development)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Security](#security)
+- [Configuration](#configuration)
+- [Operations](#operations)
+- [Commands](#commands)
+- [Exit codes](#exit-codes)
+- [Support](#support)
+- [Links](#links)
+- [License](#license)
 
-Options:
-- -n, --nano-dollars: print the balance in nano dollars
-- -c, --combined: print both USD and nano dollars
-- -s, --summary: print the credit history table
-- Short flags can be combined, like -sn or -cs.
-- -n and -c cannot be used together.
-- -v, --version: print the package.json version
-- -j, --json: print the full API response as pretty JSON
-- -h, --help: show a short help message
+## Features
 
-Configuration:
-- ENDPOINT
-- AUTH_HEADER
-- Store these values in the shell environment or a local `.env` file. Never
-  commit `.env` or expose the bearer token in logs, screenshots, or command
-  history.
+The command reads OpenAI credit data and prints a balance or credit history.
 
-Precedence:
-1. Shell environment variables
-2. .env in the current working directory
-3. .env in `~/.openai-balance/`
-4. .env in the script directory
+## Requirements
 
-For a global install, create `~/.openai-balance/.env` (for example,
-`C:\Users\you\.openai-balance\.env` on Windows or
-`/home/you/.openai-balance/.env` on Linux). Create the directory manually and
-restrict the file so it is readable only by your user.
+Use Node.js 26 or later. Configure an authorized OpenAI billing endpoint and bearer token.
 
-Example .env:
-- ENDPOINT=https://api.openai.com/v1/dashboard/billing/credit_grants
-- AUTH_HEADER=Bearer your-session-token-here
+## Setup
 
-Output:
-- Success: `2026-08-24T12:34:56.789Z OpenAI credit balance: $10.16`
-- Combined: `2026-08-24T12:34:56.789Z OpenAI credit balance: $10.16 (10,160,000,000n)`
-- Nano dollars: `2026-08-24T12:34:56.789Z OpenAI credit balance: 10,160,000,000n`
-- Summary: a table of credit history rows
-- Version: current package.json version
-- JSON: pretty-printed API response body
-- Auth failure: OpenAI credit balance: invalid bearer token
-- Other errors: one-line OpenAI credit balance: ... message
-- Invalid options: one-line OpenAI credit balance: invalid option(s): ...
+Install the package with `npm install @eliware/openai-balance`.
 
-The API response should include total_available or total_paid_available for balance mode, and grants.data for summary mode.
+## Usage
 
-Validation:
-- `npm test` runs the baseline tests, coverage gate, and lint.
-- `npm run lint` runs lint only.
-- `npm run pack` previews the files that would be published.
+Run `npx @eliware/openai-balance` after you set the required configuration.
+Read the [usage guide](docs/usage.md) for setup steps.
+Read [release notes](RELEASE_NOTES.md) for user-visible changes.
 
-Security and operations:
-- Use a least-privilege bearer token and rotate it if it is exposed.
-- The command makes one HTTPS request to `ENDPOINT` and exits with status 1
-  for configuration, authentication, HTTP, or response errors.
-- The normal balance output is timestamped in UTC; `--json` and `--summary`
-  provide structured response modes.
+## Development
+
+Read [documentation](docs/README.md), [examples](examples/README.md), and [specifications](specs/README.md).
+
+## Testing
+
+Run `npm test` for aggregate validation. Run `npm run lint` for lint checks.
+Run `npm run format:check` to check formatting. Run `npm run pack` to check package contents.
+
+## Troubleshooting
+
+Read the [troubleshooting guide](docs/troubleshooting.md) for common errors.
+
+## Security
+
+Use a least-privilege bearer token. Rotate the token if you expose it.
+Do not put real credentials in examples, logs, screenshots, or command history.
+
+## Configuration
+
+Set `ENDPOINT` and `AUTH_HEADER` in the shell or in a `.env` file.
+The command reads shell values first. It then reads the current directory, home configuration, and script directory.
+Use `~/.openai-balance/.env` for a user-level configuration file.
+Use this endpoint format: `https://api.openai.com/v1/dashboard/billing/credit_grants`.
+Use this header format: `Bearer your-session-token-here`.
+
+## Operations
+
+The command makes one HTTPS request to `ENDPOINT`. It does not change account settings or credit data.
+Balance output includes a UTC timestamp. JSON and summary output omit the timestamp.
+Balance mode needs `total_available` or `total_paid_available`. Summary mode needs `grants.data`.
+The command cancels an active request after SIGINT, SIGTERM, or SIGHUP.
+
+## Commands
+
+Run `openai-balance --help` to show command help. Run `openai-balance --version` to show the package version.
+Use `--nano-dollars` to print nano dollars. Use `--combined` to print USD and nano dollars.
+Use `--summary` to print credit history. Use `--json` to print the API response as JSON.
+Combine short flags, such as `-sn`. Do not combine `-n` and `-c`.
+
+## Exit codes
+
+The command returns code 0 after success. It returns code 1 after configuration, authentication, request, or response errors.
+It returns code 129 after SIGHUP, 130 after SIGINT, and 143 after SIGTERM.
 
 ## Support
 
-For help, questions, or community chat:
+For help, questions, or to chat with the author and community, visit:
 
-[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)
+[![Discord](https://eliware.org/logos/discord_96.png)](https://discord.gg/M6aTR9eTwN)[![eliware.org](https://eliware.org/logos/eliware_96.png)](https://discord.gg/M6aTR9eTwN)
 
-## License
-
-[MIT © Eli Sterling, eliware.org](LICENSE)
+**[eliware.org on Discord](https://discord.gg/M6aTR9eTwN)**
 
 ## Links
 
 - [Home Page](https://eliware.org)
-- [GitHub Repo](https://github.com/eliware/openai-balance)
 - [GitHub Org](https://github.com/eliware)
+- [GitHub Repo](https://github.com/eliware/openai-balance)
+- [Bug Reports](https://github.com/eliware/openai-balance/issues)
+- [npm](https://www.npmjs.com/package/@eliware/openai-balance)
 - [Discord](https://discord.gg/M6aTR9eTwN)
+
+## License
+
+[MIT © Eliware](LICENSE)

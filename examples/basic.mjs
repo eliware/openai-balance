@@ -1,1 +1,3 @@
-console.log('OpenAI balance example: run the commands documented in README.md from the project root.');
+import { formatBalance } from "@eliware/openai-balance";
+
+console.log(formatBalance(10.16));

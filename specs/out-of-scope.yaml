@@ -1,0 +1,10 @@
+version: "12.0"
+description: Lists work outside the scope of the OpenAI balance utility.
+directives:
+  - id: E-1140.1
+    dos:
+      - Keep account administration outside this utility.
+      - Keep private release procedures outside this utility.
+    donts:
+      - Do not add host-specific operations.
+      - Do not store secrets in repository files.

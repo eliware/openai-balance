@@ -1,7 +1,6 @@
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { path } from "@eliware/common";
 
-const srcDir = path.dirname(fileURLToPath(import.meta.url));
-const projectRoot = path.resolve(srcDir, '..');
+const srcDir = path(import.meta);
+const projectRoot = path(import.meta, "..");
 
 export { projectRoot, srcDir };

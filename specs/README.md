@@ -1,8 +1,5 @@
 # Specifications
 
-This directory contains developer-facing requirements for the project.
-
-## Contents
-
-- [Requirements](requirements.md)
-- [Out of scope](out-of-scope.md)
+- [Directives](directives.yaml)
+- [Out of scope](out-of-scope.yaml)
+- [Requirements](requirements.yaml)

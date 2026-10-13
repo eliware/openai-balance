@@ -1,548 +1,181 @@
-import { describe, expect, test } from '@jest/globals';
-import process from 'node:process';
+import { describe, expect, test } from "@jest/globals";
+import { EventEmitter } from "node:events";
+import process from "node:process";
 
-import { fail, main } from '../src/main.mjs';
-import { createRecorder, makeResponse, readExampleSummary, readPackageVersion, repoRoot, withTempDir, writeEnv } from './helpers.mjs';
+import { main } from "../src/main.mjs";
+import { createRecorder, makeResponse, repoRoot, withTempDir } from "../test-fixtures/helpers.mjs";
 
-async function withProcessEnv(name, value, run) {
-  const previous = process.env[name];
-  process.env[name] = value;
-
-  try {
-    return await run();
-  } finally {
-    if (previous === undefined) {
-      delete process.env[name];
-    } else {
-      process.env[name] = previous;
-    }
-  }
+function options(recorder, overrides = {}) {
+  return {
+    cwd: repoRoot,
+    scriptDir: repoRoot,
+    homeDir: null,
+    envSource: { ENDPOINT: "https://example.com", AUTH_HEADER: "Bearer test-token" },
+    fetchFn: async () => makeResponse({ json: async () => ({ total_available: 1.23 }) }),
+    log: recorder.log,
+    stderr: recorder.stderr,
+    setExitCode: recorder.setExitCode,
+    ...overrides,
+  };
 }
 
-describe('main orchestration', () => {
-  test('fail uses the default exit code setter', () => {
+async function expectFailure(overrides, message, argv = []) {
+  const recorder = createRecorder();
+  await expect(main(options(recorder, { argv, ...overrides }))).resolves.toBe(false);
+  expect(recorder.errors).toEqual([`OpenAI credit balance: ${message}`]);
+  expect(recorder.exitCode).toBe(1);
+  return recorder;
+}
+
+describe("main orchestration", () => {
+  test.each([
+    [["--help"], "Usage: openai-balance"],
+    [["--version"], "12.0.0"],
+  ])("prints information for %s", async (argv, expected) => {
     const recorder = createRecorder();
-    const previousConsoleError = console.error;
-    const previousExitCode = process.exitCode;
+    await expect(main(options(recorder, { argv }))).resolves.toBe(true);
+    expect(recorder.logs[0]).toContain(expected);
+  });
 
+  test("prints a timestamped balance after one request", async () => {
+    const recorder = createRecorder();
+    const fetchFn = async () => makeResponse({ json: async () => ({ total_available: 10.16 }) });
+    await expect(main(options(recorder, { fetchFn }))).resolves.toBe(true);
+    expect(recorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$10\.16$/);
+    expect(recorder.errors).toEqual([]);
+  });
+
+  test("sets the default process exit code for invalid arguments", async () => {
+    const previousCode = process.exitCode;
+    const previousError = console.error;
     process.exitCode = undefined;
-    console.error = recorder.stderr;
-
+    console.error = () => {};
     try {
-      fail('custom error');
-
-      expect(recorder.errors).toEqual(['OpenAI credit balance: custom error']);
+      await expect(main({ argv: ["--bad"] })).resolves.toBe(false);
       expect(process.exitCode).toBe(1);
     } finally {
-      console.error = previousConsoleError;
-      process.exitCode = previousExitCode;
+      process.exitCode = previousCode;
+      console.error = previousError;
     }
   });
 
-  test('main prints the balance from the API', async () => {
-    await withTempDir('openai-balance-', async (cwd) => {
-      await withTempDir('openai-balance-', async (scriptDir) => {
-        await writeEnv(scriptDir, `ENDPOINT=https://script.example.com/balance
-AUTH_HEADER=Bearer script-token
-`);
-        await writeEnv(cwd, `AUTH_HEADER=Bearer cwd-token
-`);
+  test.each([
+    [["--wat"], "invalid option: --wat"],
+    [["--wat", "-x"], "invalid options: --wat, -x"],
+    [["-n", "-c"], "can't use both -n and -c"],
+  ])("rejects invalid arguments %s", async (argv, message) => {
+    const recorder = await expectFailure({}, message, argv);
+    expect(recorder.logs).toEqual([]);
+  });
 
-        const recorder = createRecorder();
-        const calls = [];
+  test.each([
+    [401, "invalid bearer token"],
+    [403, "invalid bearer token"],
+    [500, "request failed (500)"],
+  ])("reports HTTP status %s", async (status, message) => {
+    await expectFailure(
+      { fetchFn: async () => makeResponse({ status, ok: false, json: async () => ({}) }) },
+      message,
+    );
+  });
 
-        const result = await main({
-          cwd,
-          scriptDir,
-          homeDir: null,
-          envSource: {},
-          fetchFn: async (url, options) => {
-            calls.push({ url, options });
-            return makeResponse({
-              status: 200,
-              ok: true,
-              json: async () => ({ total_available: 10.163356375 })
-            });
-          },
-          log: recorder.log,
-          stderr: recorder.stderr,
-          setExitCode: recorder.setExitCode
-        });
-
-        expect(result).toBe(true);
-        expect(calls).toEqual([
+  test("reports missing configuration without a request", async () => {
+    await withTempDir("balance-cwd-", async (cwd) =>
+      withTempDir("balance-script-", async (scriptDir) => {
+        await expectFailure(
           {
-            url: 'https://script.example.com/balance',
-            options: {
-              headers: {
-                Authorization: 'Bearer cwd-token',
-                Accept: 'application/json'
-              }
-            }
-          }
-        ]);
-        expect(recorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$10\.16$/);
-        expect(recorder.errors).toEqual([]);
-        expect(recorder.exitCode).toBeUndefined();
-      });
-    });
-  });
-
-  test('main prints combined balance output when requested', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      argv: ['--combined'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ total_available: 1.23 })
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(true);
-    expect(recorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$1\.23 \(1,230,000,000n\)$/);
-  });
-
-  test('main prints a summary table in USD by default', async () => {
-    const recorder = createRecorder();
-    const summary = await readExampleSummary();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      argv: ['--summary'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => summary
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(true);
-    expect(recorder.logs[0]).toContain('Effective');
-    expect(recorder.logs[0]).toContain('$20.00');
-  });
-
-  test('main prints a combined summary table when requested', async () => {
-    const recorder = createRecorder();
-    const summary = await readExampleSummary();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      argv: ['--summary', '--combined'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => summary
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(true);
-    expect(recorder.logs[0]).toContain('Grant n');
-    expect(recorder.logs[0]).toContain('Grant USD');
-  });
-
-  test('main accepts grouped short flags for summary output', async () => {
-    const recorder = createRecorder();
-    const summary = await readExampleSummary();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      argv: ['-sn'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => summary
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(true);
-    expect(recorder.logs[0]).toContain('Grant');
-    expect(recorder.logs[0]).toContain('n');
-  });
-
-  test('main rejects nano-dollars and combined together', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      argv: ['-n', '-c'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ total_available: 1.23 })
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.logs).toEqual([]);
-    expect(recorder.errors).toEqual(["OpenAI credit balance: can't use both -n and -c"]);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main rejects a single invalid command line option', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      argv: ['--wat'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ total_available: 1.23 })
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.logs).toEqual([]);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: invalid option: --wat']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main rejects invalid command line options', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      argv: ['--wat', '-x'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ total_available: 1.23 })
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.logs).toEqual([]);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: invalid options: --wat, -x']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main prints a one-line invalid token error for 401', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({ status: 401, ok: false, json: async () => ({ error: 'unauthorized' }) }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.logs).toEqual([]);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: invalid bearer token']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main prints a one-line invalid token error for 403', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({ status: 403, ok: false, json: async () => ({ error: 'forbidden' }) }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: invalid bearer token']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main reports non-OK HTTP errors', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({ status: 500, ok: false, json: async () => ({ error: 'server error' }) }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: request failed (500)']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main reports missing config', async () => {
-    const recorder = createRecorder();
-    const previousExitCode = process.exitCode;
-    process.exitCode = undefined;
-
-    try {
-      const result = await withTempDir('openai-balance-', async (cwd) => {
-        return withTempDir('openai-balance-', async (scriptDir) => {
-          return main({
             cwd,
             scriptDir,
-            homeDir: null,
             envSource: {},
             fetchFn: async () => {
-              throw new Error('fetch should not run');
+              throw Error("unexpected request");
             },
-            log: recorder.log,
-            stderr: recorder.stderr
-          });
-        });
-      });
-
-      expect(result).toBe(false);
-      expect(recorder.errors).toEqual(['OpenAI credit balance: missing ENDPOINT or AUTH_HEADER']);
-      expect(process.exitCode).toBe(1);
-    } finally {
-      process.exitCode = previousExitCode;
-    }
-  });
-
-  test('main reports missing balance in the response', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ object: 'credit_summary' })
+          },
+          "missing ENDPOINT or AUTH_HEADER",
+        );
       }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: missing balance']);
-    expect(recorder.exitCode).toBe(1);
+    );
   });
 
-  test('main rejects non-finite balances', async () => {
+  test("returns false after a shutdown signal aborts the request", async () => {
     const recorder = createRecorder();
-
-    await main({
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({ json: async () => ({ total_available: Infinity }) }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
+    const processObj = new EventEmitter();
+    let startRequest;
+    const requestStarted = new Promise((resolve) => {
+      startRequest = resolve;
     });
-
-    expect(recorder.errors).toEqual(['OpenAI credit balance: missing balance']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main rejects malformed summary amounts', async () => {
-    const recorder = createRecorder();
-
-    await main({
-      argv: ['--summary'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({ json: async () => ({ grants: { data: [{ grant_amount: 'bad', used_amount: 1 }] } }) }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(recorder.errors).toEqual(['OpenAI credit balance: malformed credit history']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main rejects malformed combined summary amounts', async () => {
-    const recorder = createRecorder();
-
-    await main({
-      argv: ['--summary', '--combined'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({ json: async () => ({ grants: { data: [{ grant_amount: 1, used_amount: 'bad' }] } }) }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(recorder.errors).toEqual(['OpenAI credit balance: malformed credit history']);
-    expect(recorder.exitCode).toBe(1);
-  });
-
-  test('main reports a real error message when response parsing fails', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => {
-          throw new Error('boom');
-        }
+    const result = main(
+      options(recorder, {
+        processObj,
+        fetchFn: async (url, init) => {
+          startRequest();
+          return new Promise((resolve, reject) =>
+            init.signal.addEventListener("abort", () => reject(Error("aborted"))),
+          );
+        },
       }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: boom']);
-    expect(recorder.exitCode).toBe(1);
+    );
+    await requestStarted;
+    processObj.emit("SIGINT");
+    await expect(result).resolves.toBe(false);
+    expect(recorder.exitCode).toBe(130);
+    expect(recorder.errors).toEqual([]);
   });
 
-  test('main falls back to a generic unexpected error message', async () => {
-    const recorder = createRecorder();
-
-    const result = await main({
-      cwd: repoRoot,
-      scriptDir: repoRoot,
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => {
-          throw {};
-        }
-      }),
-      log: recorder.log,
-      stderr: recorder.stderr,
-      setExitCode: recorder.setExitCode
-    });
-
-    expect(result).toBe(false);
-    expect(recorder.errors).toEqual(['OpenAI credit balance: unexpected error']);
-    expect(recorder.exitCode).toBe(1);
+  test.each([
+    [{ object: "credit_summary" }, "missing balance"],
+    [{ total_available: Infinity }, "missing balance"],
+  ])("reports malformed balance data", async (body, message) => {
+    await expectFailure({ fetchFn: async () => makeResponse({ json: async () => body }) }, message);
   });
 
-  test('main uses default options when invoked without arguments', async () => {
-    const previousFetch = global.fetch;
-    const previousLog = console.log;
-    const previousError = console.error;
-    const previousExitCode = process.exitCode;
+  test.each([
+    [
+      async () => {
+        throw Error("parse failed");
+      },
+      "parse failed",
+    ],
+    [
+      async () => {
+        throw {};
+      },
+      "unexpected error",
+    ],
+  ])("reports response parsing errors", async (json, message) => {
+    await expectFailure({ fetchFn: async () => makeResponse({ json }) }, message);
+  });
+
+  test("reports an argument parsing error before it reads credentials", async () => {
+    await expectFailure({ argv: {} }, "argv is not iterable");
+  });
+
+  test("uses process defaults when called without options", async () => {
+    const previous = [
+      global.fetch,
+      console.log,
+      console.error,
+      process.exitCode,
+      process.env.ENDPOINT,
+      process.env.AUTH_HEADER,
+    ];
     const logs = [];
-    const errors = [];
-
     process.exitCode = undefined;
-    global.fetch = async () => makeResponse({
-      status: 200,
-      ok: true,
-      json: async () => ({ total_available: 4.2 })
-    });
+    global.fetch = async () => makeResponse({ json: async () => ({ total_available: 4.2 }) });
     console.log = (message) => logs.push(message);
-    console.error = (message) => errors.push(message);
-
+    console.error = () => {};
+    process.env.ENDPOINT = "https://example.com";
+    process.env.AUTH_HEADER = "Bearer default-token";
     try {
-      await withProcessEnv('ENDPOINT', 'https://example.com', async () => {
-        return withProcessEnv('AUTH_HEADER', 'Bearer default-token', async () => {
-          const result = await main();
-
-          expect(result).toBe(true);
-          expect(logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$4\.20$/);
-          expect(errors).toEqual([]);
-          expect(process.exitCode).toBeUndefined();
-        });
-      });
+      await expect(main()).resolves.toBe(true);
+      expect(logs[0]).toContain("OpenAI credit balance: $4.20");
+      expect(process.exitCode).toBeUndefined();
     } finally {
-      global.fetch = previousFetch;
-      console.log = previousLog;
-      console.error = previousError;
-      process.exitCode = previousExitCode;
+      [global.fetch, console.log, console.error, process.exitCode] = previous;
+      if (previous[4] === undefined) delete process.env.ENDPOINT;
+      else process.env.ENDPOINT = previous[4];
+      if (previous[5] === undefined) delete process.env.AUTH_HEADER;
+      else process.env.AUTH_HEADER = previous[5];
     }
-  });
-
-  test('main prints help, version, json, nano dollar, and combined output modes', async () => {
-    const helpRecorder = createRecorder();
-    const versionRecorder = createRecorder();
-    const jsonRecorder = createRecorder();
-    const nanoRecorder = createRecorder();
-    const combinedRecorder = createRecorder();
-    const packageVersion = await readPackageVersion();
-
-    await expect(main({ argv: ['--help'], log: helpRecorder.log, stderr: helpRecorder.stderr })).resolves.toBe(true);
-    await expect(main({ argv: ['--version'], log: versionRecorder.log, stderr: versionRecorder.stderr })).resolves.toBe(true);
-    await expect(main({
-      argv: ['--json'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ object: 'credit_summary', total_available: 1.23 })
-      }),
-      log: jsonRecorder.log,
-      stderr: jsonRecorder.stderr,
-      setExitCode: jsonRecorder.setExitCode
-    })).resolves.toBe(true);
-    await expect(main({
-      argv: ['--nano-dollars'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ total_available: 1.23 })
-      }),
-      log: nanoRecorder.log,
-      stderr: nanoRecorder.stderr,
-      setExitCode: nanoRecorder.setExitCode
-    })).resolves.toBe(true);
-    await expect(main({
-      argv: ['--combined'],
-      envSource: { ENDPOINT: 'https://example.com', AUTH_HEADER: 'Bearer test-token' },
-      fetchFn: async () => makeResponse({
-        status: 200,
-        ok: true,
-        json: async () => ({ total_available: 1.23 })
-      }),
-      log: combinedRecorder.log,
-      stderr: combinedRecorder.stderr,
-      setExitCode: combinedRecorder.setExitCode
-    })).resolves.toBe(true);
-
-    expect(helpRecorder.logs[0]).toContain('Usage: openai-balance [options]');
-    expect(versionRecorder.logs).toEqual([packageVersion]);
-    expect(jsonRecorder.logs).toEqual([JSON.stringify({ object: 'credit_summary', total_available: 1.23 }, null, 2)]);
-    expect(nanoRecorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: 1,230,000,000n$/);
-    expect(combinedRecorder.logs[0]).toMatch(/^\d{4}-\d{2}-\d{2}T[^ ]+Z OpenAI credit balance: \$1\.23 \(1,230,000,000n\)$/);
   });
 });

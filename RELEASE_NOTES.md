@@ -1,80 +1,94 @@
 # Release Notes
 
-## 2.0.0 - 2026-08-24
+## 12.0.0 — 2026-10-13
 
-### CI and release security
+### Added
 
-- Scoped GitHub Actions OIDC (`id-token: write`) permission to the publish job
-  instead of granting it to validation jobs.
-- Kept Ubuntu and Windows validation required before tag-based publication.
+- Added request cancellation for SIGINT, SIGTERM, and SIGHUP.
+- Added credential redaction for error output.
+
+### Changed
+
+- Moved the command launcher to `bin/openai-balance.mjs`.
+- Updated package metadata and validation workflows for the shared conventions.
+
+### Migration
+
+- Use `node bin/openai-balance.mjs` to run the launcher from a source checkout.
+- Use the `openai-balance` command after you install the package.
+
+## 2.0.0 — 2026-08-24
+
+### Changed
+
+- Scoped GitHub Actions OIDC permission to the publish job.
+- Required Ubuntu and Windows validation before tag-based publication.
 - Standardized package validation on `npm pack --dry-run`.
+- Preserved generated Jest results for local and CI diagnostics.
 
-### Repository maintenance
+## 1.1.2 — 2026-08-24
 
-- Preserved generated Jest result files for local and CI diagnostics.
-- Added stricter agent working rules covering focused changes, uncertainty, and
-  self-verification.
+### Added
 
-## 1.1.2 - 2026-08-24
+- Added user-level configuration at `~/.openai-balance/.env`.
+- Added portable Ubuntu and Windows validation.
+- Added production dependency audit and package dry-run validation.
+- Added checks for malformed balance and credit history values.
 
-- Aligned test, lint, packaging, documentation, and CI workflows with the
-  shared conventions.
-- Migrated baseline testing and linting to `@eliware/test`, with 100×4
-  coverage enforcement and zero-warning lint checks.
-- Added Node.js 26 engine metadata, explicit package exports, and a package
-  file allowlist.
-- Added portable Ubuntu and Windows CI validation, production dependency
-  auditing, and package dry-run validation.
-- Separated publishing into a single gated Ubuntu job to prevent duplicate
-  publishes from the platform matrix.
-- Added user-level configuration at `~/.openai-balance/.env`, with documented
-  configuration precedence and bearer-token safety guidance.
-- Added validation for non-finite balances and malformed credit history
-  values.
-- Sanitized unexpected error messages to preserve single-line CLI errors.
-- Added an ISO 8601 UTC timestamp to normal balance output.
-- Expanded regression tests for configuration precedence, malformed API data,
-  timestamped output, and cross-platform CLI behavior.
-- Corrected scoped `npx` usage and synchronized project guidance with the
-  user-level configuration and timestamped output behavior.
+### Changed
 
-## 1.1.1 - 2026-07-11
+- Migrated tests and lint checks to `@eliware/test`.
+- Added Node.js 26 engine metadata, package exports, and an explicit package file list.
+- Added one gated Ubuntu publishing job.
+- Added UTC timestamps to balance output.
+- Sanitized error messages to keep CLI errors on one line.
 
-- Added combined USD/nano-dollar output.
-- Added credit history summary tables.
-- Added grouped short flags and CLI validation for invalid options and conflicting nano/combined flags.
-- Expanded tests for the new CLI modes.
+### Security
 
-## 1.1.0 - 2026-07-11
+- Scoped GitHub Actions OIDC permission to the publish job.
+- Added guidance to protect bearer tokens.
 
-- Split the CLI into focused modules under src/.
+## 1.1.1 — 2026-07-11
+
+### Added
+
+- Added combined USD and nano-dollar output.
+- Added credit history summary tables and grouped short flags.
+
+## 1.1.0 — 2026-07-11
+
+### Added
+
+- Split the CLI into focused modules.
 - Added help, version, JSON, and nano-dollar output modes.
-- Expanded Jest coverage for the new helpers and entrypoint behavior.
 
-## 1.0.5 - 2026-07-11
+## 1.0.5 — 2026-07-11
 
-- Release notes sync only.
+### Changed
 
-## 1.0.4 - 2026-07-11
+- Synchronized release notes with the package history.
 
-- Added `repository.url` to `package.json` so npm provenance validation matches GitHub Actions.
+## 1.0.4 — 2026-07-11
 
-## 1.0.3 - 2026-07-11
+### Fixed
 
-- Removed `private: true` from `package.json` so the package can publish.
+- Added repository metadata for npm provenance validation.
 
-## 1.0.1 - 2026-07-11
+## 1.0.3 — 2026-07-11
 
-Initial release of openai-balance.
+### Fixed
 
-- CLI prints the current OpenAI credit balance on a single line.
-- Supports `npm start`, direct execution, and the `openai-balance` bin name.
-- Loads configuration from `.env` in the script directory and current working directory.
-- Reads `ENDPOINT` and `AUTH_HEADER` for API access.
-- Formats balances as USD with two decimal places.
-- Handles missing config, auth failures, HTTP errors, and malformed responses with one-line errors.
-- Includes Jest coverage for helpers and CLI behavior.
+- Enabled npm publication by removing the private package setting.
 
-## 1.0.0 - 2026-07-11
+## 1.0.1 — 2026-07-11
 
-- Accidental release tag with half-baked code. Superseded by 1.0.1.
+### Added
+
+- Added a CLI that prints the current OpenAI credit balance.
+- Added configuration, balance formatting, error handling, and baseline tests.
+
+## 1.0.0 — 2026-07-11
+
+### Breaking changes
+
+- Replaced the accidental release with version 1.0.1.

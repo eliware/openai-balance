@@ -1,82 +1,109 @@
 {
-    "name": "@eliware/openai-balance",
-    "version": "2.0.0",
-    "type": "module",
-    "engines": {
-        "node": ">=26"
-    },
-    "exports": {
-        ".": "./src/index.mjs"
-    },
-    "files": [
-        "balance.mjs",
-        "src",
-        "README.md",
-        "RELEASE_NOTES.md",
-        "LICENSE",
-        ".env.example"
+  "name": "@eliware/openai-balance",
+  "version": "12.0.0",
+  "type": "module",
+  "description": "Display the current OpenAI credit balance in a single terminal line.",
+  "keywords": [
+    "openai",
+    "balance",
+    "credits",
+    "terminal",
+    "cli"
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "main": "./src/index.mjs",
+  "bin": {
+    "openai-balance": "./bin/openai-balance.mjs"
+  },
+  "files": [
+    "src/",
+    "docs/",
+    "README.md",
+    "AGENTS.md",
+    "LICENSE",
+    "RELEASE_NOTES.md",
+    "bin/",
+    "specs/",
+    ".env.example"
+  ],
+  "scripts": {
+    "start": "node bin/openai-balance.mjs",
+    "test": "eliware-test",
+    "lint": "eliware-test --lint",
+    "audit": "eliware-test --audit",
+    "format": "eliware-test --format",
+    "format:check": "eliware-test --format-check",
+    "pack": "eliware-test --pack"
+  },
+  "engines": {
+    "node": ">=26"
+  },
+  "dependencies": {
+    "@eliware/common": "^12.0.1"
+  },
+  "devDependencies": {
+    "@eliware/test": "^12.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/tests/**/*.test.mjs"
     ],
-    "bin": {
-        "openai-balance": "balance.mjs"
-    },
-    "scripts": {
-        "start": "node balance.mjs",
-        "test": "eliware-test",
-        "lint": "eliware-test --lint",
-        "pack": "npm pack --dry-run"
-    },
-    "devDependencies": {
-        "@eliware/test": "^6.0.1"
-    },
-    "description": "Display the current OpenAI credit balance in a single terminal line.",
-    "keywords": [
-        "openai",
-        "balance",
-        "credits",
-        "terminal",
-        "cli"
+    "collectCoverageFrom": [
+      "src/**/*.mjs"
     ],
-    "jest": {
-        "testEnvironment": "node",
-        "coveragePathIgnorePatterns": [
-            "/src/agent\\.mjs$",
-            "/src/completion\\.mjs$",
-            "/src/shell\\.mjs$",
-            "/src/tool-shell\\.mjs$"
-        ],
-        "testMatch": [
-            "**/?(*.)+(spec|test).[jt]s?(x)",
-            "**/?(*.)+(spec|test).mjs",
-            "**/?(*.)+(spec|test).cjs"
-        ]
-    },
-    "license": "MIT",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/eliware/openai-balance.git"
-    },
-    "homepage": "https://github.com/eliware/openai-balance#readme",
-    "bugs": {
-        "url": "https://github.com/eliware/openai-balance/issues"
-    },
-    "author": "Eli Sterling",
-    "prettier": {
-      "printWidth": 100,
-      "tabWidth": 2,
-      "useTabs": false,
-      "semi": true,
-      "singleQuote": false,
-      "quoteProps": "as-needed",
-      "jsxSingleQuote": false,
-      "trailingComma": "all",
-      "bracketSpacing": true,
-      "bracketSameLine": false,
-      "arrowParens": "always",
-      "proseWrap": "preserve",
-      "endOfLine": "lf"
-    },
-    "eliware": {
-      "id": "E-1140",
-      "apply": ["general", "application", "cli", "npm-published"]
+    "coverageReporters": [
+      "text",
+      "json-summary"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 100,
+        "functions": 100,
+        "lines": 100,
+        "statements": 100
+      }
     }
+  },
+  "prettier": {
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false,
+    "semi": true,
+    "singleQuote": false,
+    "quoteProps": "as-needed",
+    "jsxSingleQuote": false,
+    "trailingComma": "all",
+    "bracketSpacing": true,
+    "bracketSameLine": false,
+    "arrowParens": "always",
+    "proseWrap": "preserve",
+    "endOfLine": "lf"
+  },
+  "author": "Eliware <eliware@eliware.org>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliware/openai-balance.git"
+  },
+  "homepage": "https://github.com/eliware/openai-balance#readme",
+  "bugs": {
+    "url": "https://github.com/eliware/openai-balance/issues"
+  },
+  "eliware": {
+    "id": "E-1140",
+    "apply": [
+      "general",
+      "application",
+      "cli",
+      "npm-published"
+    ]
+  },
+  "exports": {
+    ".": "./src/index.mjs"
+  }
 }

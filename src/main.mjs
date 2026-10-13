@@ -1,16 +1,12 @@
-import { extractBalance } from './balance.mjs';
-import { parseCliArgs } from './args.mjs';
-import { getConfigValue, loadConfigEnvFile } from './env.mjs';
-import { formatBalance, formatCombinedBalance, formatHelp, formatNanoDollars, formatSummary } from './format.mjs';
-import { projectRoot } from './paths.mjs';
-import { loadPackageVersion } from './version.mjs';
-
-function fail(message, stderr = console.error, setExitCode = (code) => {
-  process.exitCode = code;
-}) {
-  stderr(`OpenAI credit balance: ${String(message).replace(/[\r\n]+/g, ' ')}`);
-  setExitCode(1);
-}
+import { redactText } from "@eliware/common";
+import { parseCliArgs } from "./args.mjs";
+import { getConfigValue, loadConfigEnvFile } from "./env.mjs";
+import { formatHelp } from "./format.mjs";
+import { fail } from "./fail.mjs";
+import { printOutput } from "./output.mjs";
+import { projectRoot } from "./paths.mjs";
+import { requestSummary } from "./request.mjs";
+import { loadPackageVersion } from "./version.mjs";
 
 async function main({
   cwd = process.cwd(),
@@ -18,24 +14,30 @@ async function main({
   homeDir,
   envSource = process.env,
   fetchFn = fetch,
+  processObj = process,
   log = console.log,
   stderr = console.error,
   now = () => new Date(),
   setExitCode = (code) => {
     process.exitCode = code;
   },
-  argv = []
+  argv = [],
 } = {}) {
+  let authHeader;
+  const reportFailure = (message) => fail(message, stderr, setExitCode);
+
   try {
     const flags = parseCliArgs(argv);
 
     if (flags.invalidOptions.length > 0) {
-      fail(`invalid option${flags.invalidOptions.length === 1 ? '' : 's'}: ${flags.invalidOptions.join(', ')}`, stderr, setExitCode);
+      reportFailure(
+        `invalid option${flags.invalidOptions.length === 1 ? "" : "s"}: ${flags.invalidOptions.join(", ")}`,
+      );
       return false;
     }
 
     if (flags.nanoDollars && flags.combined) {
-      fail("can't use both -n and -c", stderr, setExitCode);
+      reportFailure("can't use both -n and -c");
       return false;
     }
 
@@ -50,49 +52,39 @@ async function main({
     }
 
     const envFile = await loadConfigEnvFile({ cwd, scriptDir, homeDir });
-    const endpoint = getConfigValue('ENDPOINT', envFile, envSource);
-    const authHeader = getConfigValue('AUTH_HEADER', envFile, envSource);
+    const endpoint = getConfigValue("ENDPOINT", envFile, envSource);
+    authHeader = getConfigValue("AUTH_HEADER", envFile, envSource);
 
     if (!endpoint || !authHeader) {
-      fail('missing ENDPOINT or AUTH_HEADER', stderr, setExitCode);
+      reportFailure("missing ENDPOINT or AUTH_HEADER");
       return false;
     }
 
-    const response = await fetchFn(endpoint, {
-      headers: {
-        Authorization: authHeader,
-        Accept: 'application/json'
-      }
+    const response = await requestSummary(endpoint, authHeader, {
+      fetchFn,
+      processObj,
+      setExitCode,
     });
+    if (response === null) return false;
 
     if (response.status === 401 || response.status === 403) {
-      fail('invalid bearer token', stderr, setExitCode);
+      reportFailure("invalid bearer token");
       return false;
     }
 
     if (!response.ok) {
-      fail(`request failed (${response.status})`, stderr, setExitCode);
+      reportFailure(`request failed (${response.status})`);
       return false;
     }
 
     const summary = await response.json();
 
-    if (flags.summary) {
-      log(formatSummary(summary, { combined: flags.combined, nanoDollars: flags.nanoDollars }));
-      return true;
-    }
-
-    if (flags.json) {
-      log(JSON.stringify(summary, null, 2));
-      return true;
-    }
-
-    const balance = extractBalance(summary);
-    const output = flags.combined ? formatCombinedBalance(balance) : flags.nanoDollars ? formatNanoDollars(balance) : formatBalance(balance);
-    log(`${now().toISOString()} ${output}`);
-    return true;
+    return printOutput(summary, flags, { log, now });
   } catch (error) {
-    fail(error?.message || 'unexpected error', stderr, setExitCode);
+    const message = redactText(error?.message || "unexpected error", {
+      secrets: authHeader ? [authHeader] : [],
+    });
+    reportFailure(message);
     return false;
   }
 }

@@ -1,12 +1,6 @@
 # Documentation
 
-This directory contains end-user documentation for `@eliware/openai-balance`.
-
-## Contents
-
-- [Usage](usage.md)
 - [Troubleshooting](troubleshooting.md)
+- [Usage](usage.md)
 
-Audience: API users. Prerequisites: a supported runtime and authorized
-OpenAI account configuration. Expected result: the documented balance query
-completes without exposing credentials.
+Use Node.js 26 or later. Configure an authorized OpenAI billing endpoint and bearer token.

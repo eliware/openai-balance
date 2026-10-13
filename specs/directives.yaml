@@ -1,0 +1,23 @@
+version: "12.0"
+description: Defines repository maintenance and release boundaries.
+directives:
+  - id: E-1140.2
+    dos:
+      - Use Node.js 26 or later with native ESM.
+      - Run validation through eliware-test.
+      - Keep dependencies limited to maintained runtime and validation needs.
+      - Use shared Eliware APIs for redaction and signal handling.
+      - Keep source modules and matching tests under src/ and tests/.
+      - Keep examples safe and use placeholder credentials.
+      - Review package contents before publication.
+      - Require release approval before publication.
+    donts:
+      - Do not publish from validation workflows.
+      - Do not expose secrets or private data.
+    children:
+      - id: E-1140.2.0
+        dos:
+          - Check and abort an active request when the process receives a shutdown signal.
+          - Set a signal-specific nonzero exit code after request cancellation.
+        donts:
+          - Do not exit successfully after an interrupted request.
