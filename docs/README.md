@@ -1,6 +1,7 @@
 # Documentation
 
-- [Troubleshooting](troubleshooting.md)
-- [Usage](usage.md)
+Use these guides to install, configure, run, and diagnose `openai-balance`.
 
-Use Node.js 26 or later. Configure an authorized OpenAI billing endpoint and bearer token.
+- [Usage](usage.md): install the package and run the command.
+- [Configuration](configuration.md): set the endpoint and bearer token.
+- [Troubleshooting](troubleshooting.md): resolve common command errors.

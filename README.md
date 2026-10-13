@@ -24,11 +24,11 @@ Display the current OpenAI credit balance in a single terminal line.
 
 ## Features
 
-The command reads OpenAI credit data and prints a balance or credit history.
+Read the current credit balance or print credit history from an OpenAI billing endpoint.
 
 ## Requirements
 
-Use Node.js 26 or later. Configure an authorized OpenAI billing endpoint and bearer token.
+Use Node.js 26 or later. Provide an endpoint and a bearer token with access to billing data.
 
 ## Setup
 
@@ -36,9 +36,9 @@ Install the package with `npm install @eliware/openai-balance`.
 
 ## Usage
 
-Run `npx @eliware/openai-balance` after you set the required configuration.
-Read the [usage guide](docs/usage.md) for setup steps.
-Read [release notes](RELEASE_NOTES.md) for user-visible changes.
+Set the required configuration.
+Run `npx @eliware/openai-balance`.
+Read the [usage guide](docs/usage.md) and [release notes](RELEASE_NOTES.md).
 
 ## Development
 
@@ -46,44 +46,41 @@ Read [documentation](docs/README.md), [examples](examples/README.md), and [speci
 
 ## Testing
 
-Run `npm test` for aggregate validation. Run `npm run lint` for lint checks.
-Run `npm run format:check` to check formatting. Run `npm run pack` to check package contents.
+Run `npm test` for aggregate validation.
+Run `npm run lint` for lint checks.
+Run `npm run format:check` to check formatting.
+Run `npm run pack` to check package contents.
 
 ## Troubleshooting
 
-Read the [troubleshooting guide](docs/troubleshooting.md) for common errors.
+Read the [troubleshooting guide](docs/troubleshooting.md) when a command fails.
 
 ## Security
 
-Use a least-privilege bearer token. Rotate the token if you expose it.
-Do not put real credentials in examples, logs, screenshots, or command history.
+Keep the bearer token secret. Use a placeholder token in examples.
 
 ## Configuration
 
 Set `ENDPOINT` and `AUTH_HEADER` in the shell or in a `.env` file.
-The command reads shell values first. It then reads the current directory, home configuration, and script directory.
-Use `~/.openai-balance/.env` for a user-level configuration file.
-Use this endpoint format: `https://api.openai.com/v1/dashboard/billing/credit_grants`.
-Use this header format: `Bearer your-session-token-here`.
+Read the [configuration guide](docs/configuration.md) for file paths and value order.
 
 ## Operations
 
-The command makes one HTTPS request to `ENDPOINT`. It does not change account settings or credit data.
-Balance output includes a UTC timestamp. JSON and summary output omit the timestamp.
-Balance mode needs `total_available` or `total_paid_available`. Summary mode needs `grants.data`.
-The command cancels an active request after SIGINT, SIGTERM, or SIGHUP.
+The command makes one HTTPS request. It does not change account data.
+It stops the active request after SIGINT, SIGTERM, or SIGHUP.
 
 ## Commands
 
-Run `openai-balance --help` to show command help. Run `openai-balance --version` to show the package version.
-Use `--nano-dollars` to print nano dollars. Use `--combined` to print USD and nano dollars.
-Use `--summary` to print credit history. Use `--json` to print the API response as JSON.
-Combine short flags, such as `-sn`. Do not combine `-n` and `-c`.
+Run `openai-balance --help` to show command options.
+Run `openai-balance --version` to show the version.
+Use `--summary`, `--json`, `--nano-dollars`, or `--combined` to select output.
+Do not combine `--nano-dollars` with `--combined`.
 
 ## Exit codes
 
-The command returns code 0 after success. It returns code 1 after configuration, authentication, request, or response errors.
-It returns code 129 after SIGHUP, 130 after SIGINT, and 143 after SIGTERM.
+The command returns 0 after success.
+The command returns 1 after a configuration, authentication, request, or data error.
+It returns 129 after SIGHUP, 130 after SIGINT, and 143 after SIGTERM.
 
 ## Support
 
