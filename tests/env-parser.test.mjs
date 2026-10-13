@@ -10,4 +10,10 @@ describe("environment parser", () => {
       C: "hi",
     });
   });
+
+  test("ignores empty and invalid keys", () => {
+    expect(parseEnvContents("=empty\nBAD-KEY=value\n__proto__=blocked\nGOOD=value")).toEqual({
+      GOOD: "value",
+    });
+  });
 });

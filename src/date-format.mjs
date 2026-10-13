@@ -3,7 +3,10 @@ function formatDate(seconds) {
     return "-";
   }
 
-  return new Date(seconds * 1000).toISOString().slice(0, 10);
+  const date = new Date(seconds * 1000);
+  if (!Number.isFinite(seconds) || Number.isNaN(date.getTime())) return "-";
+
+  return date.toISOString().slice(0, 10);
 }
 
 export { formatDate };

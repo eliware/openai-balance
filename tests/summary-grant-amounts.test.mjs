@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { normalizeGrantAmounts } from "../src/summary-grant-amount.mjs";
+import { normalizeGrantAmounts } from "../src/summary-grant-amounts.mjs";
 
 describe("summary grant amount validation", () => {
   test("converts grant and used amounts to numbers", () => {

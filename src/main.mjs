@@ -1,7 +1,7 @@
 import { parseCliArgs } from "./args.mjs";
 import { loadConfigEnvFile } from "./config.mjs";
 import { getConfigValue } from "./config-values.mjs";
-import { validateCliFlags } from "./cli-validation.mjs";
+import { handleCliValidation } from "./cli-validation-handler.mjs";
 import { runCliCommand } from "./cli-command.mjs";
 import { fail } from "./fail.mjs";
 import { printOutput } from "./output.mjs";
@@ -31,11 +31,7 @@ async function main({
   try {
     const flags = parseCliArgs(argv);
 
-    const validationError = validateCliFlags(flags);
-    if (validationError) {
-      reportFailure(validationError);
-      return false;
-    }
+    if (!handleCliValidation(flags, reportFailure)) return false;
 
     if (await runCliCommand(flags, { scriptDir, log })) return true;
 

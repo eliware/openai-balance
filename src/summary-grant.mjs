@@ -1,4 +1,4 @@
-import { normalizeGrantAmounts } from "./summary-grant-amount.mjs";
+import { normalizeGrantAmounts } from "./summary-grant-amounts.mjs";
 
 function normalizeSummaryGrant(grant) {
   const { granted, used } = normalizeGrantAmounts(grant);

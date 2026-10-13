@@ -7,7 +7,10 @@ describe("date formatting", () => {
     expect(formatDate(0)).toBe("1970-01-01");
   });
 
-  test.each([undefined, "0", NaN])("uses a dash for invalid date %s", (value) => {
-    expect(formatDate(value)).toBe("-");
-  });
+  test.each([undefined, "0", NaN, Infinity, -Infinity, 1e20])(
+    "uses a dash for invalid date %s",
+    (value) => {
+      expect(formatDate(value)).toBe("-");
+    },
+  );
 });
