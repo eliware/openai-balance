@@ -1,19 +1,15 @@
 import process from "node:process";
 
 import { cliOptions, createDefaultFlags } from "./options.mjs";
+import { createInvalidOptions } from "./invalid-options.mjs";
 
 const shortFlagMap = Object.fromEntries(cliOptions.map(({ name, short }) => [short, name]));
 const longFlagMap = Object.fromEntries(cliOptions.map(({ name, long }) => [long, name]));
 
 function parseCliArgs(argv = process.argv.slice(2)) {
   const flags = createDefaultFlags();
-  const invalidOptions = [];
-
-  const addInvalid = (option) => {
-    if (!invalidOptions.includes(option)) {
-      invalidOptions.push(option);
-    }
-  };
+  const invalidOptions = createInvalidOptions();
+  const addInvalid = (option) => invalidOptions.add(option);
 
   for (const token of argv) {
     if (typeof token !== "string" || token.length === 0 || token === "-") {
@@ -53,7 +49,7 @@ function parseCliArgs(argv = process.argv.slice(2)) {
 
   return {
     ...flags,
-    invalidOptions,
+    invalidOptions: invalidOptions.values,
   };
 }
 

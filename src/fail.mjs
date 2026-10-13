@@ -1,3 +1,5 @@
+import { toOneLineMessage } from "./one-line-message.mjs";
+
 function fail(
   message,
   stderr = console.error,
@@ -5,7 +7,7 @@ function fail(
     process.exitCode = code;
   },
 ) {
-  const oneLineMessage = String(message).replace(/[\r\n]+/g, " ");
+  const oneLineMessage = toOneLineMessage(message);
   stderr(`OpenAI credit balance: ${oneLineMessage}`);
   setExitCode(1);
 }
