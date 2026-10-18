@@ -1,5 +1,5 @@
 import { formatUsd } from "./format-utils.mjs";
-import { formatNanoValue } from "./nano-dollar-format.mjs";
+import { formatNanoValue } from "./nano-dollar/format.mjs";
 
 function formatBalance(amount) {
   return `OpenAI credit balance: ${formatUsd(amount)}`;

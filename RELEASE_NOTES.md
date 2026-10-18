@@ -1,5 +1,17 @@
 # Release Notes
 
+## 13.0.0 — 2026-10-17
+
+### Changed
+
+- Group CLI, configuration, output, summary, and version modules by purpose.
+- Align repository files with Eliware Convention 13.0.
+
+### Fixed
+
+- Reject invalid and non-HTTPS endpoint URLs before the command sends credentials.
+- Keep bearer tokens out of endpoint errors.
+
 ## 12.0.0 — 2026-10-13
 
 ### Added
@@ -24,7 +36,7 @@
 
 ### Fixed
 
-- Return a clear error for invalid balance and grant data.
+- Return a direct error for invalid balance and grant data.
 - Redact credentials from unexpected error messages.
 - Return signal-specific exit codes and remove process handlers after each CLI run.
 
@@ -55,10 +67,10 @@
 
 ### Added
 
-- Add user-level settings at `~/.openai-balance/.env`.
+- Add user-level configuration at `~/.openai-balance/.env`.
 - Add Ubuntu and Windows CI checks, dependency audits, and package checks.
 - Check malformed balance and credit history values.
-- Add UTC timestamps to normal balance output.
+- Add UTC timestamps to standard balance output.
 
 ### Changed
 
@@ -70,49 +82,4 @@
 ### Security
 
 - Limit GitHub Actions OIDC permission to the publish job.
-- Explain how to protect bearer tokens.
-
-## 1.1.1 — 2026-07-11
-
-### Added
-
-- Add combined USD and nano-dollar output.
-- Add credit history tables and grouped short options.
-
-## 1.1.0 — 2026-07-11
-
-### Added
-
-- Add help, version, JSON, and nano-dollar output options.
-- Split the CLI into source modules.
-
-## 1.0.5 — 2026-07-11
-
-### Changed
-
-- Align release notes with package history.
-
-## 1.0.4 — 2026-07-11
-
-### Fixed
-
-- Add repository metadata for npm provenance checks.
-
-## 1.0.3 — 2026-07-11
-
-### Fixed
-
-- Allow npm publication by setting `private` to `false`.
-
-## 1.0.1 — 2026-07-11
-
-### Added
-
-- Add a CLI that prints the current OpenAI credit balance.
-- Add settings, balance formatting, error handling, and baseline tests.
-
-## 1.0.0 — 2026-07-11
-
-### Breaking changes
-
-- Mark this accidental release as superseded by version 1.0.1.
+- Show how to prevent bearer token exposure.

@@ -1,6 +1,5 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 import { EventEmitter } from "node:events";
-import process from "node:process";
 
 import { requestSummary } from "../src/request.mjs";
 
@@ -65,22 +64,7 @@ describe("balance request lifecycle", () => {
     ).rejects.toThrow("network error");
   });
 
-  test("uses native process and fetch defaults", async () => {
-    const previousFetch = global.fetch;
-    const previousExitCode = process.exitCode;
-    global.fetch = async () => ({ status: 200 });
-    try {
-      await expect(requestSummary("https://example.com", "Bearer token")).resolves.toEqual({
-        status: 200,
-      });
-    } finally {
-      global.fetch = previousFetch;
-      process.exitCode = previousExitCode;
-    }
-  });
-
-  test("sets the native exit code when shutdown aborts without an injected setter", async () => {
-    const previousExitCode = process.exitCode;
+  test("uses the supplied process object when shutdown aborts without an exit setter", async () => {
     const processObj = new EventEmitter();
     let startRequest;
     const requestStarted = new Promise((resolve) => {
@@ -99,9 +83,24 @@ describe("balance request lifecycle", () => {
       await requestStarted;
       processObj.emit("SIGTERM");
       await expect(result).resolves.toBeNull();
-      expect(process.exitCode).toBe(143);
+      expect(processObj.exitCode).toBe(143);
     } finally {
-      process.exitCode = previousExitCode;
+      processObj.removeAllListeners();
+    }
+  });
+
+  test("uses the default fetch and process dependencies", async () => {
+    const fetch = jest.spyOn(globalThis, "fetch").mockResolvedValue({ status: 200 });
+    try {
+      await expect(requestSummary("https://example.com", "Bearer token")).resolves.toEqual({
+        status: 200,
+      });
+      expect(fetch).toHaveBeenCalledWith(
+        "https://example.com",
+        expect.objectContaining({ headers: expect.any(Object) }),
+      );
+    } finally {
+      fetch.mockRestore();
     }
   });
 });

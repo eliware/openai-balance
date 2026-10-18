@@ -1,8 +1,8 @@
 import { parseCliArgs } from "./args.mjs";
 import { loadConfigEnvFile } from "./config.mjs";
-import { getConfigValue } from "./config-values.mjs";
-import { handleCliValidation } from "./cli-validation-handler.mjs";
-import { runCliCommand } from "./cli-command.mjs";
+import { getConfigValue } from "./config/values.mjs";
+import { handleCliValidation } from "./cli/validation-handler.mjs";
+import { runCliCommand } from "./cli/command.mjs";
 import { fail } from "./fail.mjs";
 import { isHttpsEndpoint } from "./https-endpoint.mjs";
 import { printOutput } from "./output.mjs";
@@ -12,17 +12,18 @@ import { redactErrorMessage } from "./redaction.mjs";
 import { processResponse } from "./response-processing.mjs";
 
 async function main({
-  cwd = process.cwd(),
+  processObj = process,
+  cwd = processObj.cwd(),
   scriptDir = projectRoot,
   homeDir,
-  envSource = process.env,
+  loadConfig = loadConfigEnvFile,
+  envSource = processObj.env,
   fetchFn = fetch,
-  processObj = process,
   log = console.log,
   stderr = console.error,
   now = () => new Date(),
   setExitCode = (code) => {
-    process.exitCode = code;
+    processObj.exitCode = code;
   },
   argv = [],
 } = {}) {
@@ -36,7 +37,7 @@ async function main({
 
     if (await runCliCommand(flags, { scriptDir, log })) return true;
 
-    const envFile = await loadConfigEnvFile({ cwd, scriptDir, homeDir });
+    const envFile = await loadConfig({ cwd, scriptDir, homeDir });
     const endpoint = getConfigValue("ENDPOINT", envFile, envSource);
     authHeader = getConfigValue("AUTH_HEADER", envFile, envSource);
 

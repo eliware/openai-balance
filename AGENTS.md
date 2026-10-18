@@ -27,7 +27,7 @@ Run `npm run pack` to check package contents.
 
 ## Security
 
-Protect credentials and tokens. Use placeholder credentials in examples.
+Prevent exposure of credentials and tokens. Use placeholder credentials in examples.
 
 ## Changes
 
@@ -36,6 +36,11 @@ Update user documentation and release notes for user-visible changes.
 ## Application
 
 The CLI makes one read-only HTTPS request to the configured endpoint.
+Run focused tests first during development.
+Run one test file with `npm test -- tests/path/to/example.test.mjs`.
+Run multiple test files with `npm test -- tests/path/to/first.test.mjs tests/path/to/second.test.mjs`.
+Prevent repeated full-suite runs during development.
+Run the full `npm test` suite for final validation before a commit, milestone, or release.
 
 ## CLI
 

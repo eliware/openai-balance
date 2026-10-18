@@ -10,7 +10,7 @@ async function requestSummary(
     fetchFn = fetch,
     processObj = process,
     setExitCode = (code) => {
-      process.exitCode = code;
+      processObj.exitCode = code;
     },
   } = {},
 ) {

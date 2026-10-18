@@ -1,11 +1,11 @@
-version: "12.0"
+version: "13.0"
 description: Defines requirements for the OpenAI balance utility.
 directives:
   - id: E-1140.0
     dos:
       - Keep balance queries read-only.
       - Preserve documented CLI behavior.
-      - Protect credentials in output and examples.
+      - Prevent credential exposure in output and examples.
       - Validate API responses before formatting them.
     donts:
       - Do not change account settings or credit data.

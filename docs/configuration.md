@@ -28,7 +28,7 @@ export AUTH_HEADER='Bearer your-token-here'
 openai-balance
 ```
 
-Shell values take priority over values in `.env` files.
+Shell values replace `.env` values.
 
 ## `.env` files
 
@@ -53,9 +53,9 @@ It reads each other line at the first `=` character. It trims spaces around keys
 It removes one matching pair of single or double quotes around a value.
 It does not expand shell variables or parse inline comments.
 
-## Protect credentials
+## Credential safety
 
 Replace `your-token-here` with a valid token outside source control.
-Do not commit `.env` files. Keep real tokens out of command history and logs.
+Do not commit `.env` files. Keep valid tokens out of command history and logs.
 Use `.env.example` only as a template with placeholder values.
-If a token appears in a public place, revoke it and create another token.
+If a token appears on a public site, revoke it and create a new token.

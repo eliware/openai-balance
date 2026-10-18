@@ -45,26 +45,27 @@ Run `openai-balance --version` to print the package version.
 
 ## Options
 
-| Option           | Short form | Result                                         |
-| ---------------- | ---------- | ---------------------------------------------- |
-| `--help`         | `-h`       | Print command help.                            |
-| `--version`      | `-v`       | Print the package version.                     |
-| `--json`         | `-j`       | Print the full API response as formatted JSON. |
-| `--nano-dollars` | `-n`       | Print the balance in nano dollars.             |
-| `--combined`     | `-c`       | Print the balance in USD and nano dollars.     |
-| `--summary`      | `-s`       | Print credit history as a table.               |
+| Option           | Short option | Result                                         |
+| ---------------- | ------------ | ---------------------------------------------- |
+| `--help`         | `-h`         | Print command help.                            |
+| `--version`      | `-v`         | Print the package version.                     |
+| `--json`         | `-j`         | Print the full API response as formatted JSON. |
+| `--nano-dollars` | `-n`         | Print the balance in nano dollars.             |
+| `--combined`     | `-c`         | Print the balance in USD and nano dollars.     |
+| `--summary`      | `-s`         | Print credit history as a table.               |
 
 Combine short options when they do not conflict. Use `-sn` to print the summary in nano dollars.
 Do not combine `-n` and `-c`. The command rejects this combination.
-Summary mode takes priority over JSON mode when both options appear.
+When both options appear, the command prints summary output and ignores JSON mode.
 
 ## Output
 
 Default output contains an ISO 8601 UTC time and the balance in USD.
 USD values have two decimal places. Nano-dollar values equal USD multiplied by one billion.
+
 JSON mode prints the full response body. It does not add a timestamp.
 Summary mode reads the `grants.data` array and prints grant, used, and available values.
-Summary rows show effective and expiry dates. A null expiry value displays as `never`.
+Summary rows show grant start and expiry dates. A null expiry value displays as `never`.
 
 Balance mode needs a numeric `total_available` or `total_paid_available` field.
 Summary mode needs numeric `grant_amount` and `used_amount` fields for each grant.
@@ -74,7 +75,8 @@ Summary mode needs numeric `grant_amount` and `used_amount` fields for each gran
 The command sends one HTTPS request to `ENDPOINT`.
 It sends `AUTH_HEADER` as the `Authorization` header and requests JSON data.
 The command does not change billing settings or credit data.
-Press Ctrl+C to stop the command. The command aborts its active request after SIGINT, SIGTERM, or SIGHUP.
+Use Ctrl+C to stop the command.
+The command aborts its active request after SIGINT, SIGTERM, or SIGHUP.
 
 ## Exit codes
 
@@ -97,4 +99,4 @@ npx @eliware/openai-balance --summary
 ```
 
 Use the `.env` file guide to store values outside command history.
-Never put a real token in source control, examples, screenshots, or logs.
+Do not put a valid token in source control, examples, screenshots, or logs.

@@ -1,5 +1,5 @@
-import { formatOutput } from "./output-format.mjs";
-import { formatTimestampedOutput } from "./output-timestamp.mjs";
+import { formatOutput } from "./output/format.mjs";
+import { formatTimestampedOutput } from "./output/timestamp.mjs";
 
 function printOutput(summary, flags, { log = console.log, now = () => new Date() } = {}) {
   const output = formatOutput(summary, flags);

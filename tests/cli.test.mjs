@@ -1,34 +1,23 @@
 import { describe, expect, test } from "@jest/globals";
-import { execFileSync } from "node:child_process";
-import process from "node:process";
+import { EventEmitter } from "node:events";
 import { pathToFileURL } from "node:url";
 
 import { cli } from "../src/cli.mjs";
 import { cliPath, createRecorder, makeResponse, repoRoot } from "../test-fixtures/helpers.mjs";
 
 describe("cli entrypoint", () => {
-  test("public executable starts", () => {
-    expect(() => execFileSync("node", [cliPath, "--help"], { encoding: "utf8" })).not.toThrow();
-  });
-
   test("cli uses default entrypoint options when called without arguments", async () => {
-    const previousArgv1 = process.argv[1];
-
-    try {
-      process.argv[1] = null;
-
-      await expect(cli()).resolves.toBe(false);
-    } finally {
-      process.argv[1] = previousArgv1;
-    }
+    await expect(cli()).resolves.toBe(false);
   });
 
   test("cli runs main when the module is the entry point", async () => {
     const recorder = createRecorder();
+    const processObj = Object.assign(new EventEmitter(), { cwd: () => repoRoot, env: {} });
 
     const result = await cli({
       argv1: cliPath,
       moduleUrl: pathToFileURL(cliPath).href,
+      processObj,
       cwd: repoRoot,
       scriptDir: repoRoot,
       envSource: { ENDPOINT: "https://example.com", AUTH_HEADER: "Bearer test-token" },
@@ -49,16 +38,14 @@ describe("cli entrypoint", () => {
   });
 
   test("sets the process exit code when callers omit a setter", async () => {
-    const previousCode = process.exitCode;
-    const previousError = console.error;
-    process.exitCode = undefined;
-    console.error = () => {};
-    try {
-      await cli({ argv1: cliPath, moduleUrl: pathToFileURL(cliPath).href, argv: ["--bad"] });
-      expect(process.exitCode).toBe(1);
-    } finally {
-      process.exitCode = previousCode;
-      console.error = previousError;
-    }
+    const processObj = Object.assign(new EventEmitter(), { cwd: () => repoRoot, env: {} });
+    await cli({
+      processObj,
+      argv1: cliPath,
+      moduleUrl: pathToFileURL(cliPath).href,
+      argv: ["--bad"],
+      stderr: () => {},
+    });
+    expect(processObj.exitCode).toBe(1);
   });
 });

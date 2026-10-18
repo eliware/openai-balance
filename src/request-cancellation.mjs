@@ -5,7 +5,7 @@ import { signalExitCodes } from "./signal-exit-codes.mjs";
 function registerRequestCancellation({
   processObj = process,
   setExitCode = (code) => {
-    process.exitCode = code;
+    processObj.exitCode = code;
   },
 } = {}) {
   const abortController = new AbortController();

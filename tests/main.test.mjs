@@ -1,15 +1,35 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 import { EventEmitter } from "node:events";
-import process from "node:process";
 
 import { main } from "../src/main.mjs";
-import { createRecorder, makeResponse, withTempDir } from "../test-fixtures/helpers.mjs";
+import { createRecorder, makeResponse, repoRoot } from "../test-fixtures/helpers.mjs";
 import { expectMainFailure, mainOptions } from "../test-fixtures/main-test-helpers.mjs";
 
 describe("main orchestration", () => {
+  test("uses defaults when called without options", async () => {
+    const processObj = globalThis.process;
+    const previousEndpoint = processObj.env.ENDPOINT;
+    const previousAuthHeader = processObj.env.AUTH_HEADER;
+    const previousExitCode = processObj.exitCode;
+    const stderr = jest.spyOn(console, "error").mockImplementation(() => {});
+    processObj.env.ENDPOINT = "http://example.invalid";
+    processObj.env.AUTH_HEADER = "Bearer test-token";
+    try {
+      await expect(main()).resolves.toBe(false);
+      expect(processObj.exitCode).toBe(1);
+    } finally {
+      if (previousEndpoint === undefined) delete processObj.env.ENDPOINT;
+      else processObj.env.ENDPOINT = previousEndpoint;
+      if (previousAuthHeader === undefined) delete processObj.env.AUTH_HEADER;
+      else processObj.env.AUTH_HEADER = previousAuthHeader;
+      processObj.exitCode = previousExitCode;
+      stderr.mockRestore();
+    }
+  });
+
   test.each([
     [["--help"], "Usage: openai-balance"],
-    [["--version"], "12.0.0"],
+    [["--version"], "13.0.0"],
   ])("prints information for %s", async (argv, expected) => {
     const recorder = createRecorder();
     await expect(main(mainOptions(recorder, { argv }))).resolves.toBe(true);
@@ -25,18 +45,17 @@ describe("main orchestration", () => {
   });
 
   test("sets the default process exit code for invalid arguments", async () => {
-    const previousCode = process.exitCode;
-    const previousError = console.error;
+    const processObj = Object.assign(new EventEmitter(), { cwd: () => repoRoot, env: {} });
     const errors = [];
-    process.exitCode = undefined;
-    console.error = (message) => errors.push(message);
+    const stderr = jest
+      .spyOn(console, "error")
+      .mockImplementation((message) => errors.push(message));
     try {
-      await expect(main({ argv: ["--bad"] })).resolves.toBe(false);
-      expect(process.exitCode).toBe(1);
+      await expect(main({ argv: ["--bad"], processObj })).resolves.toBe(false);
+      expect(processObj.exitCode).toBe(1);
       expect(errors).toEqual(["OpenAI credit balance: invalid option: --bad"]);
     } finally {
-      process.exitCode = previousCode;
-      console.error = previousError;
+      stderr.mockRestore();
     }
   });
 
@@ -67,20 +86,15 @@ describe("main orchestration", () => {
   });
 
   test("reports missing configuration without a request", async () => {
-    await withTempDir("balance-cwd-", async (cwd) =>
-      withTempDir("balance-script-", async (scriptDir) => {
-        await expectMainFailure(
-          {
-            cwd,
-            scriptDir,
-            envSource: {},
-            fetchFn: async () => {
-              throw Error("unexpected request");
-            },
-          },
-          "missing ENDPOINT or AUTH_HEADER",
-        );
-      }),
+    await expectMainFailure(
+      {
+        envSource: {},
+        loadConfig: async () => ({}),
+        fetchFn: async () => {
+          throw Error("unexpected request");
+        },
+      },
+      "missing ENDPOINT or AUTH_HEADER",
     );
   });
 
@@ -154,32 +168,24 @@ describe("main orchestration", () => {
     await expectMainFailure({ argv: {} }, "argv is not iterable");
   });
 
-  test("uses process defaults when called without options", async () => {
-    const previous = [
-      global.fetch,
-      console.log,
-      console.error,
-      process.exitCode,
-      process.env.ENDPOINT,
-      process.env.AUTH_HEADER,
-    ];
-    const logs = [];
-    process.exitCode = undefined;
-    global.fetch = async () => makeResponse({ json: async () => ({ total_available: 4.2 }) });
-    console.log = (message) => logs.push(message);
-    console.error = () => {};
-    process.env.ENDPOINT = "https://example.com";
-    process.env.AUTH_HEADER = "Bearer default-token";
-    try {
-      await expect(main()).resolves.toBe(true);
-      expect(logs[0]).toContain("OpenAI credit balance: $4.20");
-      expect(process.exitCode).toBeUndefined();
-    } finally {
-      [global.fetch, console.log, console.error, process.exitCode] = previous;
-      if (previous[4] === undefined) delete process.env.ENDPOINT;
-      else process.env.ENDPOINT = previous[4];
-      if (previous[5] === undefined) delete process.env.AUTH_HEADER;
-      else process.env.AUTH_HEADER = previous[5];
-    }
+  test("uses injected config and output handlers without an exit setter", async () => {
+    const recorder = createRecorder();
+    const processObj = Object.assign(new EventEmitter(), {
+      cwd: () => repoRoot,
+      env: { ENDPOINT: "https://example.com", AUTH_HEADER: "Bearer test-token" },
+    });
+    await expect(
+      main({
+        scriptDir: repoRoot,
+        homeDir: null,
+        loadConfig: async () => ({}),
+        processObj,
+        fetchFn: async () => makeResponse({ json: async () => ({ total_available: 4.2 }) }),
+        log: recorder.log,
+        stderr: recorder.stderr,
+      }),
+    ).resolves.toBe(true);
+    expect(recorder.logs[0]).toContain("OpenAI credit balance: $4.20");
+    expect(processObj.exitCode).toBeUndefined();
   });
 });

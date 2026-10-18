@@ -15,14 +15,14 @@ Check that the shell does not override a valid `.env` value.
 ## The request fails
 
 Check the endpoint URL and network access.
-Check that the endpoint returns a successful HTTP response and a JSON body.
+Check that the endpoint returns a 2xx HTTP status and a JSON body.
 The command sends one request. It does not retry a failed request.
 The command prints one error line and redacts credentials from unexpected errors.
 
 ## The response has no balance
 
 Balance mode needs numeric `total_available` or `total_paid_available` data.
-Ask the endpoint owner to confirm the response format if both fields are absent.
+Ask the endpoint owner to confirm the response format if both fields are missing.
 
 ## Credit history is unavailable
 
@@ -36,9 +36,9 @@ Use default balance mode if the endpoint does not return grant history.
 
 SIGINT, SIGTERM, and SIGHUP stop the active request.
 Exit codes 130, 143, and 129 identify SIGINT, SIGTERM, and SIGHUP in that order.
-Run the command again when the endpoint and network are ready.
+Run the command again when the endpoint and network are available.
 
-## Get help
+## Help
 
 Run `openai-balance --help` to check option names.
 Read the [usage guide](usage.md) for examples and output details.

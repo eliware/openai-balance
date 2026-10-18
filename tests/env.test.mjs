@@ -1,24 +1,21 @@
 import { describe, expect, test } from "@jest/globals";
-import fs from "node:fs/promises";
-import path from "node:path";
-
 import { loadEnvFile } from "../src/env.mjs";
-import { withTempDir } from "../test-fixtures/helpers.mjs";
 
 describe("env helpers", () => {
   test("loadEnvFile parses comments, blanks, and bare lines", async () => {
-    await withTempDir("openai-balance-", async (dir) => {
-      const file = path.join(dir, ".env");
-      await fs.writeFile(file, "A=1\n# comment\n\n");
-
-      await expect(loadEnvFile(file)).resolves.toEqual({ A: "1" });
+    await expect(loadEnvFile("settings.env", async () => "A=1\n# comment\n\n")).resolves.toEqual({
+      A: "1",
     });
   });
 
   test("loadEnvFile returns {} for missing files", async () => {
-    await withTempDir("openai-balance-", async (dir) => {
-      await expect(loadEnvFile(path.join(dir, "missing.env"))).resolves.toEqual({});
-    });
+    await expect(
+      loadEnvFile("missing.env", async () => {
+        const error = new Error("missing");
+        error.code = "ENOENT";
+        throw error;
+      }),
+    ).resolves.toEqual({});
   });
 
   test("loadEnvFile rethrows non-ENOENT errors", async () => {

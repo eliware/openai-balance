@@ -1,6 +1,6 @@
-import { normalizeSummaryGrants } from "./summary-data.mjs";
+import { normalizeSummaryGrants } from "./summary/data.mjs";
 import { formatTable } from "./table.mjs";
-import { formatSummaryRows } from "./summary-format.mjs";
+import { formatSummaryRows } from "./summary/format.mjs";
 
 function formatSummary(summary, { combined = false, nanoDollars = false } = {}) {
   const grants = normalizeSummaryGrants(summary);

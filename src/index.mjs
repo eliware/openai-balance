@@ -1,12 +1,12 @@
 export { extractBalance } from "./balance.mjs";
 export { parseCliArgs } from "./args.mjs";
 export { loadConfigEnvFile } from "./config.mjs";
-export { getConfigValue } from "./config-values.mjs";
+export { getConfigValue } from "./config/values.mjs";
 export { loadEnvFile } from "./env.mjs";
 export { formatBalance, formatCombinedBalance, formatNanoDollars } from "./balance-format.mjs";
 export { formatHelp } from "./help-format.mjs";
 export { formatSummary } from "./summary.mjs";
 export { cli, toRealFileUrl } from "./cli.mjs";
 export { fail, main } from "./main.mjs";
-export { loadPackageVersion } from "./version-loader.mjs";
+export { loadPackageVersion } from "./version/loader.mjs";
 export { projectRoot, srcDir } from "./paths.mjs";

@@ -1,5 +1,5 @@
 import { cliOptions, createDefaultFlags } from "./options.mjs";
-import { getCliArgs } from "./cli-argv.mjs";
+import { getCliArgs } from "./cli/argv.mjs";
 
 const shortFlagMap = Object.fromEntries(cliOptions.map(({ name, short }) => [short, name]));
 const longFlagMap = Object.fromEntries(cliOptions.map(({ name, long }) => [long, name]));

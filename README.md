@@ -2,7 +2,7 @@
 
 ## @eliware/openai-balance [![npm](https://img.shields.io/npm/v/@eliware/openai-balance)](https://www.npmjs.com/package/@eliware/openai-balance) [![License](https://img.shields.io/github/license/eliware/openai-balance)](https://github.com/eliware/openai-balance/blob/main/LICENSE) [![CI](https://github.com/eliware/openai-balance/actions/workflows/ci.yaml/badge.svg)](https://github.com/eliware/openai-balance/actions/workflows/ci.yaml)
 
-Display the current OpenAI credit balance in a single terminal line.
+Show the current OpenAI credit balance in one terminal line.
 
 ## Table of Contents
 
