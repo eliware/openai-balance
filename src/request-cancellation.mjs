@@ -1,13 +1,7 @@
-import process from "node:process";
 import { registerSignals } from "@eliware/common";
 import { signalExitCodes } from "./signal-exit-codes.mjs";
 
-function registerRequestCancellation({
-  processObj = process,
-  setExitCode = (code) => {
-    processObj.exitCode = code;
-  },
-} = {}) {
+function registerRequestCancellation({ processObj, setExitCode }) {
   const abortController = new AbortController();
   let interrupted = false;
   const lifecycle = registerSignals({

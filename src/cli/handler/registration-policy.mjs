@@ -1,9 +1,9 @@
-import { createCliHandlerPolicy } from "./policy.mjs";
+import { createCliEventPolicy } from "./event-policy.mjs";
 
 function createCliRegistrationPolicy({ processObj, stderr, setExitCode } = {}) {
   return {
     events: ["uncaughtException", "unhandledRejection", "warning"],
-    log: createCliHandlerPolicy({ processObj, stderr, setExitCode }),
+    log: createCliEventPolicy({ processObj, stderr, setExitCode }),
   };
 }
 
