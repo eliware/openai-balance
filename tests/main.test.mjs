@@ -39,11 +39,12 @@ describe("main orchestration", () => {
   test.each([
     [["--help", "--bad"], "Usage: openai-balance"],
     [["--version", "--bad"], "15.0.1"],
-  ])("prints information for %s despite invalid options", async (argv, expected) => {
+  ])("prints information for %s and rejects invalid options", async (argv, expected) => {
     const recorder = createRecorder();
-    await expect(main(mainOptions(recorder, { argv }))).resolves.toBe(true);
+    await expect(main(mainOptions(recorder, { argv }))).resolves.toBe(false);
     expect(recorder.logs[0]).toContain(expected);
-    expect(recorder.errors).toEqual([]);
+    expect(recorder.errors).toEqual(["OpenAI credit balance: invalid option: --bad"]);
+    expect(recorder.exitCode).toBe(1);
   });
 
   test("prints a timestamped balance after one request", async () => {
