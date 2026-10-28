@@ -1,8 +1,7 @@
-import { toOneLineMessage } from "../../one-line-message.mjs";
+import { formatCliHandlerMessage } from "./message.mjs";
 
 function fail(message, stderr = console.error, setExitCode, processObj = process) {
-  const oneLineMessage = toOneLineMessage(message);
-  stderr(`OpenAI credit balance: ${oneLineMessage}`);
+  stderr(formatCliHandlerMessage(message));
   (setExitCode ?? ((code) => (processObj.exitCode = code)))(1);
 }
 

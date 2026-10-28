@@ -1,4 +1,5 @@
 import process from "node:process";
+import { formatCliHandlerMessage } from "./message.mjs";
 
 function createCliHandlerPolicy({
   stderr = console.error,
@@ -10,10 +11,10 @@ function createCliHandlerPolicy({
   return {
     debug() {},
     warn(message) {
-      stderr(`OpenAI credit balance: ${message}`);
+      stderr(formatCliHandlerMessage(message));
     },
     error(message) {
-      stderr(`OpenAI credit balance: ${message}`);
+      stderr(formatCliHandlerMessage(message));
       setExitCode(1);
     },
   };
