@@ -1,16 +1,15 @@
 # Release Notes
 
-## 13.0.0 — 2026-10-17
+## 15.0.1 — 2026-10-28
 
 ### Changed
 
-- Group CLI, configuration, output, summary, and version modules by purpose.
-- Align repository files with Eliware Convention 13.0.
-
-### Fixed
-
-- Reject invalid and non-HTTPS endpoint URLs before the command sends credentials.
-- Keep bearer tokens out of endpoint errors.
+- Set the package and both Eliware dependencies to 15.0.1.
+- Keep CLI, configuration, output, summary, and version modules in named folders.
+- Align package files, specifications, documentation, and workflows with Eliware Test 15.
+- Update CI to fetch full history and use the current GitHub actions.
+- Use the canonical npm publication workflow and required Knit commands.
+- Inject process and file access in tests to isolate external effects.
 
 ## 12.0.0 — 2026-10-13
 

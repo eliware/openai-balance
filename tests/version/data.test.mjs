@@ -4,7 +4,7 @@ import { parsePackageVersion } from "../../src/version/data.mjs";
 
 describe("package version data", () => {
   test("returns a non-empty package version", () => {
-    expect(parsePackageVersion('{"version":"13.0.0"}')).toBe("13.0.0");
+    expect(parsePackageVersion('{"version":"15.0.1"}')).toBe("15.0.1");
   });
 
   test.each(["{}", '{"version":""}', '{"version":12}'])(

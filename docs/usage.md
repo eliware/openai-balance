@@ -68,7 +68,9 @@ Summary mode reads the `grants.data` array and prints grant, used, and available
 Summary rows show grant start and expiry dates. A null expiry value displays as `never`.
 
 Balance mode needs a numeric `total_available` or `total_paid_available` field.
-Summary mode needs numeric `grant_amount` and `used_amount` fields for each grant.
+JSON mode also needs one of these numeric balance fields.
+Each summary grant needs numeric `effective_at`, `grant_amount`, and `used_amount` values.
+Each summary grant needs an `expires_at` value that is numeric or `null`.
 
 ## Request and shutdown
 

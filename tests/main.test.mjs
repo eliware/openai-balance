@@ -29,7 +29,7 @@ describe("main orchestration", () => {
 
   test.each([
     [["--help"], "Usage: openai-balance"],
-    [["--version"], "13.0.0"],
+    [["--version"], "15.0.1"],
   ])("prints information for %s", async (argv, expected) => {
     const recorder = createRecorder();
     await expect(main(mainOptions(recorder, { argv }))).resolves.toBe(true);

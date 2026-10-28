@@ -24,7 +24,7 @@ describe("CLI process handlers", () => {
       processObj.emit("unhandledRejection", Error("secret-value"));
       expect(errors).toEqual([
         "OpenAI credit balance: Warning",
-        "OpenAI credit balance: Unhandled Rejection",
+        "OpenAI credit balance: Unhandled promise error",
       ]);
       expect(processObj.exitCode).toBe(1);
       expect(handlers.removed).toBe(false);

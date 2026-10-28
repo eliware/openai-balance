@@ -20,7 +20,7 @@ describe("CLI information commands", () => {
         { scriptDir: repoRoot, log: (value) => logs.push(value) },
       ),
     ).resolves.toBe(true);
-    expect(logs[0]).toBe("13.0.0");
+    expect(logs[0]).toBe("15.0.1");
   });
 
   test("reports when no information command applies", async () => {

@@ -1,4 +1,4 @@
-version: "13.0"
+version: "15.0"
 description: Defines requirements for the OpenAI balance utility.
 directives:
   - id: E-1140.0
