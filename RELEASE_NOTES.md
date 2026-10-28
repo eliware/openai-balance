@@ -2,14 +2,33 @@
 
 ## 15.0.1 — 2026-10-28
 
+### Added
+
+- Add focused modules and matching tests for CLI handlers, endpoint checks, environment keys, date checks, and version values.
+- Include runnable examples in the npm package.
+
 ### Changed
 
-- Set the package and both Eliware dependencies to 15.0.1.
-- Keep CLI, configuration, output, summary, and version modules in named folders.
-- Align package files, specifications, documentation, and workflows with Eliware Test 15.
-- Update CI to fetch full history and use the current GitHub actions.
-- Use the canonical npm publication workflow and required Knit commands.
-- Inject process and file access in tests to isolate external effects.
+- Set the package, `@eliware/common`, and `@eliware/test` to version 15.0.1.
+- Refresh dependencies to their latest available versions.
+- Organize CLI, configuration, environment, output, response, summary, and version code into focused modules.
+- Separate CLI argument parsing, handler policies, message formatting, and request cancellation.
+- Validate grant amounts as finite numbers.
+- Require each non-null grant expiry to follow its start date.
+- Validate JSON response objects before output.
+- Allow JSON mode to print full response objects without balance fields.
+- Reject invalid CLI options before running help or version commands.
+- Allow `ENDPOINT` only on HTTPS at `api.openai.com` without a custom port or URL credentials.
+- Ignore `beforeExit` when the command handles request cancellation.
+- Update end-user guides, repository specifications, and package metadata.
+- Use canonical GitHub Actions and npm publication workflows.
+- Fetch full Git history in CI and use current GitHub Actions.
+- Keep the Knit workflow on the `/eliware/openai-balance` project path.
+- Isolate process and file access in tests.
+
+### Security
+
+- Keep bearer tokens away from hosts other than `api.openai.com`.
 
 ## 12.0.0 — 2026-10-13
 
