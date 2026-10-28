@@ -39,12 +39,26 @@ describe("main orchestration", () => {
   test.each([
     [["--help", "--bad"], "Usage: openai-balance"],
     [["--version", "--bad"], "15.0.1"],
-  ])("prints information for %s and rejects invalid options", async (argv, expected) => {
+  ])("rejects invalid options before running %s", async (argv) => {
     const recorder = createRecorder();
     await expect(main(mainOptions(recorder, { argv }))).resolves.toBe(false);
-    expect(recorder.logs[0]).toContain(expected);
     expect(recorder.errors).toEqual(["OpenAI credit balance: invalid option: --bad"]);
     expect(recorder.exitCode).toBe(1);
+    expect(recorder.logs).toEqual([]);
+  });
+
+  test("rejects a null JSON response before printing it", async () => {
+    const recorder = createRecorder();
+    await expect(
+      main(
+        mainOptions(recorder, {
+          argv: ["--json"],
+          fetchFn: async () => makeResponse({ json: async () => null }),
+        }),
+      ),
+    ).resolves.toBe(false);
+    expect(recorder.logs).toEqual([]);
+    expect(recorder.errors).toEqual(["OpenAI credit balance: invalid API response"]);
   });
 
   test("prints a timestamped balance after one request", async () => {

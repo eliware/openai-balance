@@ -8,6 +8,9 @@ function formatOutput(summary, flags) {
     return formatSummary(summary, { combined: flags.combined, nanoDollars: flags.nanoDollars });
   }
   if (flags.json) {
+    if (summary === null || typeof summary !== "object" || Array.isArray(summary)) {
+      throw new Error("invalid API response");
+    }
     return JSON.stringify(summary, null, 2);
   }
 

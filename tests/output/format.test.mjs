@@ -12,4 +12,8 @@ describe("output formatter", () => {
   test("prints JSON data without balance fields", () => {
     expect(formatOutput({ status: "ok" }, { json: true })).toBe('{\n  "status": "ok"\n}');
   });
+
+  test.each([null, "invalid", 2, []])("rejects non-object JSON responses", (summary) => {
+    expect(() => formatOutput(summary, { json: true })).toThrow("invalid API response");
+  });
 });

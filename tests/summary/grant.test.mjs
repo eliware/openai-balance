@@ -19,6 +19,8 @@ describe("summary grant normalization", () => {
     { effective_at: "10", expires_at: null },
     { effective_at: 10, expires_at: "20" },
     { effective_at: 10, expires_at: Infinity },
+    { effective_at: 10, expires_at: 9 },
+    { effective_at: 10, expires_at: 10 },
   ])("rejects malformed grant dates: %o", (dates) => {
     expect(() =>
       normalizeSummaryGrant({

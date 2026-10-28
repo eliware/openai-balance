@@ -29,6 +29,7 @@ Ask the endpoint owner to confirm the response format if both fields are missing
 Summary mode needs an array at `grants.data`.
 Each grant needs a numeric `effective_at` value.
 Each grant needs an `expires_at` value that is numeric or `null`.
+Each non-null expiry date must be later than its start date.
 Each grant needs numeric `grant_amount` and `used_amount` values.
 Use default balance mode if the endpoint does not return grant history.
 
