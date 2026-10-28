@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { parseEnvContents } from "../src/env-parser.mjs";
+import { parseEnvContents } from "../../src/env/parser.mjs";
 
 describe("environment parser", () => {
   test("parses values, comments, blank lines, and matching quotes", () => {

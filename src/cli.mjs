@@ -1,6 +1,5 @@
-import { setupCliHandlers } from "./cli/handler/setup.mjs";
 import { isCliEntryPoint, toRealFileUrl } from "./cli/entry.mjs";
-import { main } from "./main.mjs";
+import { runCli } from "./cli/runner.mjs";
 
 async function cli({
   processObj = process,
@@ -10,13 +9,8 @@ async function cli({
   ...mainOptions
 } = {}) {
   if (isCliEntryPoint(argv1, moduleUrl)) {
-    const { setExitCode, handlers } = setupCliHandlers({ ...mainOptions, processObj });
-    try {
-      await main({ ...mainOptions, processObj, setExitCode, argv });
-      return true;
-    } finally {
-      handlers.removeHandlers();
-    }
+    await runCli({ ...mainOptions, processObj, argv });
+    return true;
   }
 
   return false;

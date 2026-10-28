@@ -1,8 +1,8 @@
+import { classifyResponse } from "./response/classify.mjs";
+
 async function processResponse(response) {
-  if (response.status === 401 || response.status === 403) {
-    return { error: "invalid bearer token" };
-  }
-  if (!response.ok) return { error: `request failed (${response.status})` };
+  const classification = classifyResponse(response);
+  if (classification) return classification;
   return { summary: await response.json() };
 }
 
