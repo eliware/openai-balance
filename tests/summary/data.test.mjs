@@ -11,8 +11,8 @@ describe("credit history data", () => {
             {
               effective_at: 10,
               expires_at: null,
-              grant_amount: "12.5",
-              used_amount: "2.5",
+              grant_amount: 12.5,
+              used_amount: 2.5,
             },
           ],
         },
