@@ -1,5 +1,5 @@
 import { normalizeGrantAmounts } from "./grant-amounts.mjs";
-import { isValidDateSeconds } from "../date-format.mjs";
+import { isValidDateSeconds } from "../date/validation.mjs";
 
 function normalizeSummaryGrant(grant) {
   if (!isValidDateSeconds(grant.effective_at)) {

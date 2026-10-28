@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { parsePackageVersion } from "../../src/version/data.mjs";
+import { parsePackageVersion } from "../../src/version/parser.mjs";
 
 describe("package version data", () => {
   test("returns a non-empty package version", () => {

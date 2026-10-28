@@ -1,7 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 
-import { fail } from "../src/fail.mjs";
-import { createRecorder } from "../test-fixtures/helpers.mjs";
+import { fail } from "../../../src/cli/handler/fail.mjs";
+import { createRecorder } from "../../../test-fixtures/helpers.mjs";
 
 describe("fail helper", () => {
   test("uses the default exit code setter", () => {

@@ -1,8 +1,4 @@
-function isValidDateSeconds(seconds) {
-  if (typeof seconds !== "number" || !Number.isFinite(seconds)) return false;
-  const date = new Date(seconds * 1000);
-  return !Number.isNaN(date.getTime());
-}
+import { isValidDateSeconds } from "./date/validation.mjs";
 
 function formatDate(seconds) {
   if (!isValidDateSeconds(seconds)) return "-";
@@ -10,4 +6,4 @@ function formatDate(seconds) {
   return new Date(seconds * 1000).toISOString().slice(0, 10);
 }
 
-export { formatDate, isValidDateSeconds };
+export { formatDate };

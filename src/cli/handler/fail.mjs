@@ -1,4 +1,4 @@
-import { toOneLineMessage } from "./one-line-message.mjs";
+import { toOneLineMessage } from "../../one-line-message.mjs";
 
 function fail(message, stderr = console.error, setExitCode, processObj = process) {
   const oneLineMessage = toOneLineMessage(message);

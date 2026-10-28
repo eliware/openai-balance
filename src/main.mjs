@@ -3,7 +3,8 @@ import { loadConfigEnvFile } from "./config.mjs";
 import { getConfigValue } from "./config/values.mjs";
 import { handleCliValidation } from "./cli/validation-handler.mjs";
 import { runCliCommand } from "./cli/command.mjs";
-import { fail } from "./fail.mjs";
+import { getCliArgs } from "./cli/argv.mjs";
+import { fail } from "./cli/handler/fail.mjs";
 import { isHttpsEndpoint } from "./config/endpoint.mjs";
 import { printOutput } from "./output.mjs";
 import { projectRoot } from "./paths.mjs";
@@ -31,7 +32,7 @@ async function main({
   const reportFailure = (message) => fail(message, stderr, setExitCode);
 
   try {
-    const flags = parseCliArgs(argv);
+    const flags = parseCliArgs(getCliArgs(argv, processObj.argv));
 
     if (!handleCliValidation(flags, reportFailure)) return false;
 

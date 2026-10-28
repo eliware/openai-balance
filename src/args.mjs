@@ -1,11 +1,10 @@
 import { cliOptions, createDefaultFlags } from "./options.mjs";
-import { getCliArgs } from "./cli/argv.mjs";
 
 const shortFlagMap = Object.fromEntries(cliOptions.map(({ name, short }) => [short, name]));
 const longFlagMap = Object.fromEntries(cliOptions.map(({ name, long }) => [long, name]));
 
 function parseCliArgs(inputArgv) {
-  const argv = getCliArgs(inputArgv);
+  const argv = inputArgv;
   const flags = createDefaultFlags();
   const invalidOptions = [];
   const addInvalid = (option) => {
