@@ -36,6 +36,16 @@ describe("main orchestration", () => {
     expect(recorder.logs[0]).toContain(expected);
   });
 
+  test.each([
+    [["--help", "--bad"], "Usage: openai-balance"],
+    [["--version", "--bad"], "15.0.1"],
+  ])("prints information for %s despite invalid options", async (argv, expected) => {
+    const recorder = createRecorder();
+    await expect(main(mainOptions(recorder, { argv }))).resolves.toBe(true);
+    expect(recorder.logs[0]).toContain(expected);
+    expect(recorder.errors).toEqual([]);
+  });
+
   test("prints a timestamped balance after one request", async () => {
     const recorder = createRecorder();
     const fetchFn = async () => makeResponse({ json: async () => ({ total_available: 10.16 }) });

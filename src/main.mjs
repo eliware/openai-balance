@@ -34,9 +34,9 @@ async function main({
   try {
     const flags = parseCliArgs(getCliArgs(argv, processObj.argv));
 
-    if (!handleCliValidation(flags, reportFailure)) return false;
-
     if (await runCliCommand(flags, { scriptDir, log })) return true;
+
+    if (!handleCliValidation(flags, reportFailure)) return false;
 
     const envFile = await loadConfig({ cwd, scriptDir, homeDir });
     const endpoint = getConfigValue("ENDPOINT", envFile, envSource);
