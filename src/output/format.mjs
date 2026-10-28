@@ -8,7 +8,6 @@ function formatOutput(summary, flags) {
     return formatSummary(summary, { combined: flags.combined, nanoDollars: flags.nanoDollars });
   }
   if (flags.json) {
-    extractBalance(summary);
     return JSON.stringify(summary, null, 2);
   }
 

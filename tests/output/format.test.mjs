@@ -9,7 +9,7 @@ describe("output formatter", () => {
     );
   });
 
-  test("rejects JSON data without a numeric balance", () => {
-    expect(() => formatOutput({ grants: { data: [] } }, { json: true })).toThrow("missing balance");
+  test("prints JSON data without balance fields", () => {
+    expect(formatOutput({ status: "ok" }, { json: true })).toBe('{\n  "status": "ok"\n}');
   });
 });
