@@ -8,6 +8,7 @@ function registerRequestCancellation({ processObj, setExitCode }) {
     processObj,
     exit: false,
     shutdownHook(signalName) {
+      if (!Object.hasOwn(signalExitCodes, signalName)) return;
       interrupted = true;
       setExitCode(signalExitCodes[signalName]);
       abortController.abort();

@@ -4,6 +4,7 @@ import { formatSummary } from "../summary.mjs";
 
 function formatOutput(summary, flags) {
   if (flags.summary) {
+    extractBalance(summary);
     return formatSummary(summary, { combined: flags.combined, nanoDollars: flags.nanoDollars });
   }
   if (flags.json) {

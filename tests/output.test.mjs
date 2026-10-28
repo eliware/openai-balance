@@ -32,4 +32,15 @@ describe("CLI output modes", () => {
       console.log = previousLog;
     }
   });
+
+  test.each([undefined, "1", Infinity])("requires a numeric balance in summary mode", (balance) => {
+    const response = {
+      total_available: balance,
+      grants: summary.grants,
+    };
+
+    expect(() => printOutput(response, { summary: true }, { log: () => {} })).toThrow(
+      "missing balance",
+    );
+  });
 });
