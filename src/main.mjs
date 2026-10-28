@@ -4,7 +4,7 @@ import { getConfigValue } from "./config/values.mjs";
 import { handleCliValidation } from "./cli/validation-handler.mjs";
 import { runCliCommand } from "./cli/command.mjs";
 import { fail } from "./fail.mjs";
-import { isHttpsEndpoint } from "./https-endpoint.mjs";
+import { isHttpsEndpoint } from "./config/endpoint.mjs";
 import { printOutput } from "./output.mjs";
 import { projectRoot } from "./paths.mjs";
 import { requestSummary } from "./request.mjs";

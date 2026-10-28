@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import { parseEnvContents } from "./env/parser.mjs";
+import { parseEnvContents } from "./parser.mjs";
 
 async function loadEnvFile(filePath, readFile = fs.readFile) {
   try {

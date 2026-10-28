@@ -1,21 +1,18 @@
-import { describe, expect, test } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 
 import { loadPackageVersion } from "../../src/version/loader.mjs";
 
 describe("package version loader", () => {
-  test("loads the package version through default dependencies", async () => {
-    await expect(loadPackageVersion()).resolves.toBe("15.0.1");
-  });
+  const readFile = jest.fn(async () => '{"version":"15.0.1"}');
+  test.each([
+    ["default dependencies", undefined],
+    ["an injected reader", { scriptDir: "package-root", readFile }],
+  ])("loads the package version with %s", async (dependencyName, options) => {
+    await expect(loadPackageVersion(options)).resolves.toBe("15.0.1");
 
-  test("loads the package version", async () => {
-    const readFile = async (filePath, encoding) => {
-      expect(filePath).toContain("package.json");
-      expect(encoding).toBe("utf8");
-      return '{"version":"15.0.1"}';
-    };
-    await expect(loadPackageVersion({ scriptDir: "package-root", readFile })).resolves.toBe(
-      "15.0.1",
-    );
+    if (dependencyName === "an injected reader") {
+      expect(readFile).toHaveBeenCalledWith(expect.stringContaining("package.json"), "utf8");
+    }
   });
 
   test("rejects package data without a version", async () => {

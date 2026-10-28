@@ -2,7 +2,7 @@ import os from "node:os";
 import process from "node:process";
 
 import { getConfigPaths } from "./config/paths.mjs";
-import { loadEnvFile } from "./env.mjs";
+import { loadEnvFile } from "./env/file-reader.mjs";
 import { projectRoot } from "./paths.mjs";
 
 async function loadConfigEnvFile({

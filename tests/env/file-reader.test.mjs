@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import { loadEnvFile } from "../src/env.mjs";
+import { loadEnvFile } from "../../src/env/file-reader.mjs";
 
 describe("env helpers", () => {
   test("loadEnvFile parses comments, blanks, and bare lines", async () => {

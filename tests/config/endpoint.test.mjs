@@ -1,6 +1,6 @@
 import { describe, expect, test } from "@jest/globals";
 
-import { isHttpsEndpoint } from "../src/https-endpoint.mjs";
+import { isHttpsEndpoint } from "../../src/config/endpoint.mjs";
 
 describe("HTTPS endpoint validation", () => {
   test.each([
