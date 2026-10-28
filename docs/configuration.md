@@ -7,7 +7,7 @@ It has no default endpoint or token.
 
 | Name          | Required | Value                                                            |
 | ------------- | -------- | ---------------------------------------------------------------- |
-| `ENDPOINT`    | Yes      | HTTPS URL for an OpenAI billing endpoint.                        |
+| `ENDPOINT`    | Yes      | HTTPS URL on `api.openai.com` for a billing endpoint.            |
 | `AUTH_HEADER` | Yes      | Authorization header with the `Bearer` scheme and a valid token. |
 
 Use this endpoint as a starting point:
@@ -17,6 +17,7 @@ https://api.openai.com/v1/dashboard/billing/credit_grants
 ```
 
 The endpoint must accept the request and return JSON. The command does not create or grant token access.
+Use `api.openai.com` as the host to keep the bearer token on the OpenAI API.
 
 ## Environment variables
 

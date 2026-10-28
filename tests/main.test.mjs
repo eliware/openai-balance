@@ -141,7 +141,7 @@ describe("main orchestration", () => {
       ).resolves.toBe(false);
       expect(requestCount).toBe(0);
       expect(recorder.errors).toEqual([
-        "OpenAI credit balance: ENDPOINT must be a valid HTTPS URL",
+        "OpenAI credit balance: ENDPOINT must use HTTPS on api.openai.com",
       ]);
       expect(recorder.errors.join(" ")).not.toContain("private-token");
     },
@@ -197,7 +197,7 @@ describe("main orchestration", () => {
     const recorder = createRecorder();
     const processObj = Object.assign(new EventEmitter(), {
       cwd: () => repoRoot,
-      env: { ENDPOINT: "https://example.com", AUTH_HEADER: "Bearer test-token" },
+      env: { ENDPOINT: "https://api.openai.com", AUTH_HEADER: "Bearer test-token" },
     });
     await expect(
       main({

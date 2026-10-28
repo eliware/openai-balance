@@ -8,7 +8,7 @@ function mainOptions(recorder, overrides = {}) {
     cwd: repoRoot,
     scriptDir: repoRoot,
     homeDir: null,
-    envSource: { ENDPOINT: "https://example.com", AUTH_HEADER: "Bearer test-token" },
+    envSource: { ENDPOINT: "https://api.openai.com", AUTH_HEADER: "Bearer test-token" },
     fetchFn: async () => makeResponse({ json: async () => ({ total_available: 1.23 }) }),
     log: recorder.log,
     stderr: recorder.stderr,

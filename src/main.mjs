@@ -46,7 +46,7 @@ async function main({
       return false;
     }
     if (!isHttpsEndpoint(endpoint)) {
-      reportFailure("ENDPOINT must be a valid HTTPS URL");
+      reportFailure("ENDPOINT must use HTTPS on api.openai.com");
       return false;
     }
 
