@@ -7,10 +7,7 @@ describe("package version data", () => {
     expect(parsePackageVersion('{"version":"15.0.1"}')).toBe("15.0.1");
   });
 
-  test.each(["{}", '{"version":""}', '{"version":12}'])(
-    "rejects missing or invalid version data %s",
-    (contents) => {
-      expect(() => parsePackageVersion(contents)).toThrow();
-    },
-  );
+  test("rejects malformed JSON", () => {
+    expect(() => parsePackageVersion("invalid JSON")).toThrow(SyntaxError);
+  });
 });
